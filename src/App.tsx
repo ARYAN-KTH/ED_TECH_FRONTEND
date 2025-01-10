@@ -1,8 +1,8 @@
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from "./components/uiComponents/Navbar";
-import SignUpScreen from './pages/User/SignUpScreen';
-import LoginScreen from './pages/User/LoginScreen';
+import SignUpScreen from './pages/User/SignUpScree/SignUpScreen';
+import LoginScreen from './pages/User/LoginScreen/LoginScreen';
 
 const App = () => {
   return (
