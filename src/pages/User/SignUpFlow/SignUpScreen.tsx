@@ -6,11 +6,13 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/uiComponents/Navbar";
 import { zodResolver } from "@hookform/resolvers/zod";
 import formSchema from "./formSchema";
-import { SignUpFormData } from "./type";
+import { SignUpFormData,ApiResponse } from "./type";
+import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import api from "../../../axiosService";
+import { toast } from "sonner";
 
 
 const SignUpScreen = () => {
@@ -22,21 +24,18 @@ const SignUpScreen = () => {
 
   // Define the mutation
   const mutation = useMutation({
-    mutationFn: (data:SignUpFormData) => {
-         const response = api.post("/signup", data); // Replace with your API endpoint
-         return response.data;
-    }, // Function to perform the API call
-    onSuccess: (data) => {
-      // Handle success (e.g., update cache or show notification)
-      console.log("Success:", data);
+    mutationFn: async (data: SignUpFormData): Promise<ApiResponse> => {
+      const response = await api.post<ApiResponse>("/user/register", data);
+      console.log(response);
+      return response.data; // Ensure response.data ka type ApiResponse ho
     },
-    onError: (error) => {
-      // Handle error (e.g., show error notification)
-      console.error("Error:", error);
+    onSuccess: (data: ApiResponse) => {
+      toast.success(data.message || "Account created successfully!");
     },
-    onSettled: () => {
-      // Always called (whether successful or failed)
-      console.log("Mutation completed");
+    onError: (error: AxiosError<ApiResponse>) => {
+      console.log(error);
+      const errorMessage = error.response?.data?.message || "Something went wrong!";
+      toast.error(errorMessage);
     },
   });
 

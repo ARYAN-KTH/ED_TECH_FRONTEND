@@ -6,3 +6,7 @@ export interface SignUpFormData {
     password: string;
 }
 
+export interface ApiResponse {
+    message: string; 
+  }
+  
