@@ -13,9 +13,12 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import api from "../../../axiosService";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 
 const SignUpScreen = () => {
+
+  const navigate = useNavigate();
   const { register, handleSubmit,formState: { errors } } = useForm<SignUpFormData>({
     resolver: zodResolver(formSchema)
   });
@@ -29,8 +32,10 @@ const SignUpScreen = () => {
       console.log(response);
       return response.data; // Ensure response.data ka type ApiResponse ho
     },
-    onSuccess: (data: ApiResponse) => {
+    onSuccess: (data: ApiResponse,SignUpFormData) => {
+      console.log("Navigation triggered to /otp");
       toast.success(data.message || "Account created successfully!");
+      navigate("/otp",{state:{email:SignUpFormData.email}});
     },
     onError: (error: AxiosError<ApiResponse>) => {
       console.log(error);
@@ -88,7 +93,7 @@ const SignUpScreen = () => {
               {errors.password && <p className="text-red-500 text-xs">{errors.password.message}</p>}
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-              <Button type="submit">Create Account</Button>
+              <Button type="submit" className={` ${mutation.isPending ? "bg-gray-400 cursor-not-allowed" : ""}`}>{mutation.isPending ? "Loading..." : "Signup"}</Button>
               <span>Already have account <Link to="/login" className="text-blue-800 hover:underline">login here</Link>!</span>
             </div>
           </form>
