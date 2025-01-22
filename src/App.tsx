@@ -5,6 +5,7 @@ import SignUpScreen from './pages/User/SignUpFlow/SignUpScreen';
 import LoginScreen from './pages/User/LoginScreen/LoginScreen';
 import OtpScreen from './pages/User/SignUpFlow/OtpScreen';
 import HomePage from './pages/User/HomeScreen/HomePage';
+import CreateCourseStep1 from './pages/User/ProtectedPages/Recruiter/CourseCreation/CreateCourseStep1';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/otp" element={<OtpScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/home" element={<HomePage/>} />
+          <Route path="/create-course-step1" element={<CreateCourseStep1/>} />
         </Routes>
       </Router>
     </div>

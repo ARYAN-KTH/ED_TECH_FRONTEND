@@ -9,6 +9,7 @@ import { ApiResponse } from "../SignUpFlow/type";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import api from "../../../axiosService";
+import { useState } from "react";
 
 interface loginData {
   email: string;
@@ -23,8 +24,10 @@ const LoginScreen = () => {
     formState: { errors },
   } = useForm<loginData>();
 
+  const [activeTab, setActiveTab] = useState("Student");
+
   const mutation = useMutation({
-    mutationFn: async (data: loginData): Promise<ApiResponse> => {
+    mutationFn: async (data: loginData & {role:string}): Promise<ApiResponse> => {
       const response = await api.post<ApiResponse>("/user/login", data, { withCredentials: true });
       console.log(response);
       return response.data; // Ensure response.data ka type ApiResponse ho
@@ -35,7 +38,11 @@ const LoginScreen = () => {
       if (data?.accessToken) {
         localStorage.setItem("token", data.accessToken);
       }
-      Navigate("/Home");
+      if(activeTab === "Instructor"){
+        Navigate("/create-course-step1");
+      }else{
+        Navigate("/Home");
+      }
     },
     onError: (error: AxiosError<ApiResponse>) => {
       console.log(error);
@@ -46,7 +53,7 @@ const LoginScreen = () => {
 
 
   const submitHandler = (data: loginData) => {
-    mutation.mutate(data);
+    mutation.mutate({...data,role:activeTab});
     console.log("Login Success", data);
   };
 
@@ -59,7 +66,7 @@ const LoginScreen = () => {
             Welcome Back, Discover your passion
           </p>
           <div>
-            <Tabs defaultValue="Student" className="w-full">
+            <Tabs defaultValue="Student" onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full">
                 <TabsTrigger value="Student" className="w-1/2">
                   Student
