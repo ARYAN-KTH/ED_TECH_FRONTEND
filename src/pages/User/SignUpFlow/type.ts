@@ -9,5 +9,12 @@ export interface SignUpFormData {
 export interface ApiResponse {
     message: string; 
     accessToken: string;
+    user: {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string;
+        role: string;
+    }
   }
   

@@ -38,6 +38,7 @@ const LoginScreen = () => {
       if (data?.accessToken) {
         localStorage.setItem("token", data.accessToken);
       }
+      localStorage.setItem("user", JSON.stringify(data.user));
       if(activeTab === "Instructor"){
         Navigate("/create-course-step1");
       }else{

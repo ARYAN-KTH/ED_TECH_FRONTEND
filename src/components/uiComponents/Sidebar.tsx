@@ -1,4 +1,5 @@
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { Link } from "react-router-dom"
 
 import {
   Sidebar,
@@ -31,7 +32,7 @@ const items = [
   },
   {
     title: "Logout",
-    url: "#",
+    url: "/logout",
     icon: Search,
   },
   {
@@ -41,10 +42,50 @@ const items = [
   },
 ]
 
+const TalentItems = [
+  {
+    title: "My Profile",
+    url: "#",
+    icon: Home,
+  },
+  {
+    title: "Enrollerd Courses",
+    url: "#",
+    icon: Inbox,
+  },
+  {
+    title: "Wishlist",
+    url: "#",
+    icon: Calendar,
+  },
+  {
+    title: "Purchase History",
+    url: "#",
+    icon: Calendar,
+  },
+  {
+    title: "Course",
+    url: "#",
+    icon: Calendar,
+  },
+  {
+    title: "Logout",
+    url: "/logout",
+    icon: Search,
+  },
+  {
+    title: "Settings",
+    url: "#",
+    icon: Settings,
+  },
+]
+
+console.log(TalentItems)
+
 export function AppSidebar() {
   return (
     <SidebarProvider>
-    <Sidebar className = "mt-12">
+    <Sidebar className = "mt-16">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -53,10 +94,10 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+                    <Link to={item.url}>
+                    <span><item.icon/></span>
+                    {item.title}
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
