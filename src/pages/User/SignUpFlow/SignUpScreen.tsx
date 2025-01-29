@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../../../axiosService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import {signInWithGoogle} from "../../../googleSignup/auth";
 
 const SignUpScreen = () => {
   const navigate = useNavigate();
@@ -28,9 +29,21 @@ const SignUpScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("Student");
 
+  const googleSignupHandler = async () => {
+    try {
+      const result = await signInWithGoogle();
+      mutation.mutate({email:result.email,googleAuth:true,firstName:result.displayName,lastName:result.displayName,phone:"3287447473", password:result.uid, role:activeTab});
+      console.log("User Info:", result);
+    } catch (error) {
+      console.error("Error during login", error);
+    }
+  };
+
   // Define the mutation
   const mutation = useMutation({
-    mutationFn: async (data: SignUpFormData & {role:string}): Promise<ApiResponse> => {
+    mutationFn: async (
+      data: SignUpFormData & { role: string }
+    ): Promise<ApiResponse> => {
       const response = await api.post<ApiResponse>("/user/register", data);
       console.log(response);
       return response.data; // Ensure response.data ka type ApiResponse ho
@@ -50,7 +63,7 @@ const SignUpScreen = () => {
 
   // Trigger the mutation
   const submitHandler = (data: SignUpFormData) => {
-    mutation.mutate({...data,role:activeTab}); // Pass the payload to the mutation function
+    mutation.mutate({ ...data, role: activeTab }); // Pass the payload to the mutation function
   };
 
   return (
@@ -62,7 +75,11 @@ const SignUpScreen = () => {
             Welcome Back, Discover your passion
           </p>
           <div>
-            <Tabs defaultValue="Student" onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              defaultValue="Student"
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="w-full">
                 <TabsTrigger value="Student" className="w-1/2">
                   Student
@@ -162,6 +179,9 @@ const SignUpScreen = () => {
                   </Link>
                   !
                 </span>
+                <Button onClick={googleSignupHandler}>
+                 Signup with Google
+                </Button>
               </div>
             </form>
           </div>

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { AxiosError } from "axios";
 import api from "../../../axiosService";
 import { useState } from "react";
+import {signInWithGoogle} from "../../../googleSignup/auth";
 
 interface loginData {
   email: string;
@@ -25,6 +26,16 @@ const LoginScreen = () => {
   } = useForm<loginData>();
 
   const [activeTab, setActiveTab] = useState("Student");
+
+  const googleLoginHandler = async () => {
+    try {
+      const result = await signInWithGoogle();
+      mutation.mutate({email:result.email, password:result.uid, role:activeTab});
+      console.log("User Info:", result);
+    } catch (error) {
+      console.error("Error during login", error);
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: async (data: loginData & {role:string}): Promise<ApiResponse> => {
@@ -123,6 +134,9 @@ const LoginScreen = () => {
                   !
                 </span>
               </div>
+              <Button onClick={googleLoginHandler}>
+                login with Google
+              </Button>
             </form>
           </div>
         </div>

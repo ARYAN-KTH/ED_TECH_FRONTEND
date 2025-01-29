@@ -4,7 +4,7 @@ import { z } from "zod";
 const courseFormSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
-  price: z.number().min(1, { message: "Price is required" }),
+  price: z.number({ invalid_type_error: "Price must be a number" }).min(1, { message: "Price must be at least 1" }),
   category: z.enum(["Web Development", "Data Science", "AI/ML", "Blockchain", "Others"], {
     message: "Category is required",
   }),

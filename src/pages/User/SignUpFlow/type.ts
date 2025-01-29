@@ -4,6 +4,7 @@ export interface SignUpFormData {
     email: string;
     phone: string;
     password: string;
+    googleAuth?: boolean;
 }
 
 export interface ApiResponse {
