@@ -48,6 +48,17 @@ const CreateCourseStep1 = () => {
   const [requirements, setRequirements] = useState<string[]>([]);
   const [newRequirement, setNewRequirement] = useState("");
 
+  const [courseThumbnail, setCourseThumbnail] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      console.log("file is ", file);
+      setCourseThumbnail(file);
+      setValue("courseThumbnail", courseThumbnail);
+    }
+  };
+
   const handleAddBenefit = () => {
     if (newBenefit.trim()) {
       // Add new benefit to the array
@@ -83,7 +94,12 @@ const CreateCourseStep1 = () => {
   };
 
   const mutation = useMutation({
-    mutationFn: async (data: z.infer<typeof courseFormSchema>) => await api.post("/course/create-course", data),
+    mutationFn: async (data: z.infer<typeof courseFormSchema>) => await api.post("/course/create-course", data,{
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
+    }),
     onSuccess: () => {
       toast.success("Course created successfully!");
       navigate("/create-course");
@@ -219,9 +235,9 @@ const CreateCourseStep1 = () => {
                 Course Thumbnail *
               </label>
               <Input
-                {...register("courseThumbnail")}
+                type="file"
+                onChange={handleFileChange}
                 className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter thumbnail URL"
               />
               {errors.courseThumbnail && (
                 <p className="text-red-500">{errors.courseThumbnail.message}</p>

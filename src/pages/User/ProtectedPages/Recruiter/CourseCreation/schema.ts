@@ -9,7 +9,11 @@ const courseFormSchema = z.object({
     message: "Category is required",
   }),
   tag: z.string().min(1, { message: "Tag is required" }),
-  courseThumbnail: z.string().url({ message: "Thumbnail URL must be valid" }),
+  courseThumbnail: z.any()
+    .refine((file) => file instanceof File, { message: "Course thumbnail is required" })
+    .refine((file) => file instanceof File && file.type.startsWith('image/'), { 
+      message: "File must be an image" 
+    }),
   benifits: z.array(z.string()).min(1, { message: "At least one benefit is required" }),
   requirements: z.array(z.string()).min(1, { message: "At least one requirement is required" }),
 });
