@@ -10,7 +10,7 @@ import CreateCourse from './pages/User/ProtectedPages/Recruiter/CourseCreation/C
 import LogoutPage from './components/uiComponents/LogoutPage';
 import IndividualCourse from './pages/User/ProtectedPages/Recruiter/CourseCreation/IndividualCourse';
 import CoursePage from './pages/User/CourseScreen/CourseScreen';
-import AboutUsPage from './pages/User/AboutUsScreen/AboutUsScreen';
+import AboutUsPage from './pages/User/AboutUsScreen/AboutUsScreen' ;
 
 const App = () => {
   return (
