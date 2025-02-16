@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Define Zod schema for the course form
-const courseFormSchema = z.object({
+export const courseFormSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
   price: z.number({ invalid_type_error: "Price must be a number" }).min(1, { message: "Price must be at least 1" }),
@@ -18,4 +18,24 @@ const courseFormSchema = z.object({
   requirements: z.array(z.string()).min(1, { message: "At least one requirement is required" }),
 });
 
-export default courseFormSchema;
+
+//Section Schema
+export const sectionFormSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().min(10, { message: "Description is required" }),
+});
+
+
+//Sub-Section Schema
+ export const subSectionFormSchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  description: z.string().min(1, { message: "Description is required" }),
+  videoUrl: z.string().min(1, { message: "Video URL is required" }),
+});
+
+export type SubSectionFormValues = z.infer<typeof subSectionFormSchema>;
+export type SectionFormValues = z.infer<typeof sectionFormSchema>;
+
+
+
+
