@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import api from "../../../../../axiosService";
 import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import { Button } from "@/components/ui/button";
-import { Slash, Plus } from "lucide-react";
+import { Slash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Card,
   CardDescription,
@@ -20,14 +20,36 @@ import {
 import { useNavigate } from "react-router-dom";
 import { CourseResponse } from "./types";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 const CreateCourseStep1 = () => {
   const navigate = useNavigate();
 
+  const [page, setPage] = useState(1);
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    for (let i = 1; i <= courseData.totalPages; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => setPage(i)}
+          className={`px-3 py-1 rounded-md ${i === page ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
+  
+
   const { data: courseData } = useQuery<CourseResponse>({
-    queryKey: ["course"],
+    queryKey: ["course", page],
     queryFn: async () => {
-      const res = await api.get("/course/get-courses");
+      const res = await api.get("/course/get-courses", {
+        params: { page },
+      });
       return res.data;
     },
   });
@@ -62,7 +84,11 @@ const CreateCourseStep1 = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courseData?.data.map((course, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow" onClick={() => navigate(`/individual-course`)}>
+            <Card
+              key={index}
+              className="hover:shadow-lg transition-shadow"
+              onClick={() => navigate(`/individual-course`)}
+            >
               <CardHeader>
                 <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
                   <img
@@ -75,13 +101,29 @@ const CreateCourseStep1 = () => {
                   <Badge variant="secondary">{course.category}</Badge>
                   <Badge variant="outline">{course.tag}</Badge>
                 </div>
-                <CardTitle className="text-xl font-bold">{course.title}</CardTitle>
+                <CardTitle className="text-xl font-bold">
+                  {course.title}
+                </CardTitle>
                 <CardDescription className="line-clamp-2">
                   {course.description}
                 </CardDescription>
               </CardHeader>
             </Card>
           ))}
+        </div>
+        <div className="flex items-center gap-2 justify-center">
+          {/* Previous Page Button */}
+          <ChevronLeft
+            onClick={() => page > 1 && setPage(page - 1)}
+            className="cursor-pointer"
+          />
+              {renderPageNumbers()}
+          
+          {/* Next Page Button */}
+          <ChevronRight
+            onClick={() => page < courseData.totalPages && setPage(page + 1)}
+            className="cursor-pointer"
+          />
         </div>
       </div>
     </ProtectedLayout>

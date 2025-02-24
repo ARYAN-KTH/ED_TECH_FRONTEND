@@ -1,6 +1,7 @@
 export interface CourseResponse {
     message: string
     data: Course[]
+    totalPages: number
   }
   
   export interface Course {
