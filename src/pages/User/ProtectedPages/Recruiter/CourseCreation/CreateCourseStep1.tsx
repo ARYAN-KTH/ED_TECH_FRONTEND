@@ -51,8 +51,6 @@ const CreateCourseStep1 = () => {
   const [requirements, setRequirements] = useState<string[]>([]);
   const [newRequirement, setNewRequirement] = useState("");
 
-  // const [courseThumbnail, setCourseThumbnail] = useState<File | null>(null);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -67,7 +65,7 @@ const CreateCourseStep1 = () => {
       // Add new benefit to the array
       const updatedBenefits = [...benefits, newBenefit];
       setBenefits(updatedBenefits); // Update the state with the new benefit
-
+      
       // Update the form value for benefits
       setValue("benifits", updatedBenefits); // This will make sure the form has the latest value
 
@@ -364,9 +362,10 @@ const CreateCourseStep1 = () => {
               </Button>
               <Button
                 type="submit"
+                disabled={mutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6"
               >
-                Next Step
+                {mutation.isPending? "Creating Course..." : "Next Step"}
               </Button>
             </div>
           </form>

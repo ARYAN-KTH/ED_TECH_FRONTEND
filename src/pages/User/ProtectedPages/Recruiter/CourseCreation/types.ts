@@ -24,4 +24,34 @@ export interface CourseResponse {
     lastName: string
     email: string
   }
+
+
+  export interface SectionResponse {
+    message: string
+    data: Section[]
+  }
+  
+  export interface Section {
+    _id: string
+    title: string
+    description: string
+    course: string
+    subSections: SubSection[]
+    createdAt: string
+    updatedAt: string
+    __v: number
+  }
+  
+  export interface SubSection {
+    _id: string
+    title: string
+    description: string
+    course: string
+    section: string
+    videoUrl: string
+    createdAt: string
+    updatedAt: string
+    __v: number
+  }
+  
   
