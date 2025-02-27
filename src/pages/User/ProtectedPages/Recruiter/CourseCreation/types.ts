@@ -54,5 +54,52 @@ export interface CourseResponse {
     updatedAt: string
     __v: number
   }
+
+
+  export interface IndividualCourseResponse {
+    message: string
+    data: IndividualCourse
+  }
+  
+  export interface IndividualCourse {
+    _id: string
+    title: string
+    description: string
+    instructor: string
+    price: number
+    category: string
+    tag: string
+    courseThumbnail: string
+    benifits: string[]
+    requirements: string[]
+    courseSections: CourseSection[]
+    createdAt: string
+    updatedAt: string
+    __v: number
+  }
+  
+  export interface CourseSection {
+    _id: string
+    title: string
+    description: string
+    course: string
+    subSections: SubSection[]
+    createdAt: string
+    updatedAt: string
+    __v: number
+  }
+  
+  export interface SubSection {
+    _id: string
+    title: string
+    description: string
+    course: string
+    section: string
+    videoUrl: string
+    createdAt: string
+    updatedAt: string
+    __v: number
+  }
+  
   
   

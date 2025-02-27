@@ -29,7 +29,7 @@ const CreateCourseStep1 = () => {
 
   const renderPageNumbers = () => {
     const pages = [];
-    for (let i = 1; i <= courseData.totalPages; i++) {
+    for (let i = 1; i <= courseData?.totalPages; i++) {
       pages.push(
         <button
           key={i}
@@ -87,7 +87,7 @@ const CreateCourseStep1 = () => {
             <Card
               key={index}
               className="hover:shadow-lg transition-shadow"
-              onClick={() => navigate(`/individual-course`)}
+              onClick={() => navigate(`/individual-course?id=${course._id}`)}
             >
               <CardHeader>
                 <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
