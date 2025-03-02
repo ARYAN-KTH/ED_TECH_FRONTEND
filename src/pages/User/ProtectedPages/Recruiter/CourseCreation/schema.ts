@@ -14,14 +14,13 @@ export const courseFormSchema = z.object({
     }
   ),
   tag: z.string().min(1, { message: "Tag is required" }),
-  courseThumbnail: z
-    .any()
-    .refine((file) => file instanceof File, {
-      message: "Course thumbnail is required",
-    })
-    .refine((file) => file instanceof File && file.type.startsWith("image/"), {
+  courseThumbnail: z.union([
+    z.instanceof(File).refine((file) => file.type.startsWith("image/"), {
       message: "File must be an image",
     }),
+    z.string().url({ message: "Invalid image URL" }) // ✅ URL bhi allow karega
+  ]),
+  
   benifits: z
     .array(z.string())
     .min(1, { message: "At least one benefit is required" }),
@@ -40,19 +39,28 @@ export const sectionFormSchema = z.object({
 export const subSectionFormSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
   description: z.string().min(1, { message: "Description is required" }),
-  videoUrl: z
-    .any()
-    .refine((file) => file instanceof File, { message: "Video is required" })
-    .refine((file) => file instanceof File && file.type.startsWith("video/"), {
+  videoUrl: z.union([
+    z.instanceof(File).refine((file) => file.type.startsWith("video/"), {
       message: "File must be a video",
     }),
+    z.string().url({ message: "Invalid video URL" }),
+  ]),
 });
 
 export type SubSectionFormValues = z.infer<typeof subSectionFormSchema>;
 export type SectionFormValues = z.infer<typeof sectionFormSchema>;
 
 export const editFormSchema = courseFormSchema.extend({
-  
+  sections: z
+    .array(
+      sectionFormSchema.extend({
+        subsections: z.array(subSectionFormSchema).min(1, {
+          message: "At least one subsection is required",
+        }),
+      })
+    )
+    .min(1, { message: "At least one section is required" }),
 });
+
 
 export type EditFormValues = z.infer<typeof editFormSchema>;
