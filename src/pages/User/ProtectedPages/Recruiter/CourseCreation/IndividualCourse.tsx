@@ -3,7 +3,7 @@
 import ProtectedLayout from "@/components/layouts/ProtectedLayout"
 import api from "../../../../../axiosService"
 import { useQuery } from "@tanstack/react-query"
-import type { IndividualCourseResponse } from "./types"
+import type { CourseSection, IndividualCourseResponse } from "./types"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -26,12 +26,14 @@ import {
   Download,
   MessageSquare,
   Info,
+  ExternalLink,
 } from "lucide-react"
 import { format } from "date-fns"
 import { useSearchParams } from "react-router-dom"
 import { useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import EditCourse from "./EditCourse"
 
 const IndividualCourse = () => {
   const [searchParams] = useSearchParams()
@@ -112,6 +114,7 @@ const IndividualCourse = () => {
             className="w-full h-[300px] object-cover"
           />
         </div>
+          <EditCourse course={courseData} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Main Content */}
@@ -163,17 +166,11 @@ const IndividualCourse = () => {
                     </CardTitle>
                     <CardDescription>
                       {course.courseSections.length} sections • {totalLessons} lessons •{" "}
-                      {course.courseSections.reduce(
-                        (total, section) =>
-                          total + section.subSections.reduce((subTotal, sub) => subTotal + (sub.duration || 0), 0),
-                        0,
-                      )}{" "}
-                      total minutes
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Accordion type="single" collapsible className="w-full">
-                      {course.courseSections.map((section, index) => (
+                      {course.courseSections.map((section:CourseSection, index:number) => (
                         <AccordionItem key={section._id} value={`section-${index}`}>
                           <AccordionTrigger className="text-lg">
                             <div className="flex items-center gap-2">
@@ -182,37 +179,31 @@ const IndividualCourse = () => {
                             </div>
                           </AccordionTrigger>
                           <AccordionContent>
-                            <div className="space-y-2 pl-4">
-                              {section.subSections.map((subsection) => (
-                                <div
-                                  key={subsection._id}
-                                  className="flex items-center justify-between p-3 rounded-lg hover:bg-accent group cursor-pointer"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                      <Play className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <span>{subsection.title}</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Badge
-                                      variant="outline"
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      {subsection.duration || 10} min
-                                    </Badge>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                      <Download className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </AccordionContent>
+              <div className="space-y-2 pl-4">
+                {section.subSections.map((subsection) => (
+                  <div
+                    key={subsection._id}
+                    className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/50 group cursor-pointer transition-colors"
+                    onClick={() => window.open(subsection?.videoUrl, '_blank')}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Play className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="font-medium">
+                        {subsection.title}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        Click to watch
+                      </span>
+                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
                         </AccordionItem>
                       ))}
                     </Accordion>

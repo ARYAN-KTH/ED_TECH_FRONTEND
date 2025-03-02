@@ -50,3 +50,9 @@ export const subSectionFormSchema = z.object({
 
 export type SubSectionFormValues = z.infer<typeof subSectionFormSchema>;
 export type SectionFormValues = z.infer<typeof sectionFormSchema>;
+
+export const editFormSchema = courseFormSchema.extend({
+  
+});
+
+export type EditFormValues = z.infer<typeof editFormSchema>;
