@@ -51,16 +51,26 @@ export type SubSectionFormValues = z.infer<typeof subSectionFormSchema>;
 export type SectionFormValues = z.infer<typeof sectionFormSchema>;
 
 export const editFormSchema = courseFormSchema.extend({
-  sections: z
-    .array(
-      sectionFormSchema.extend({
-        subsections: z.array(subSectionFormSchema).min(1, {
-          message: "At least one subsection is required",
-        }),
-      })
-    )
-    .min(1, { message: "At least one section is required" }),
+  sections: z.array(
+    z.object({
+      title: z.string().min(1, { message: "Section title is required" }),
+      description: z.string().min(1, { message: "Section description is required" }),
+      subSections: z.array(
+        z.object({
+          title: z.string().min(1, { message: "Sub-section title is required" }),
+          description: z.string().min(1, { message: "Sub-section description is required" }),
+          videoUrl: z.union([
+            z.instanceof(File).refine((file) => file.type.startsWith("video/"), {
+              message: "File must be a video",
+            }),
+            z.string().url({ message: "Invalid video URL" }),
+          ]),
+        })
+      )
+    })
+  ).min(1, { message: "At least one section is required" })
 });
+
 
 
 export type EditFormValues = z.infer<typeof editFormSchema>;

@@ -38,7 +38,7 @@ const refreshAccessToken = async () => {
 // Create an Axios instance
 const api = axios.create({
   // baseURL: "https://ed-tech-backend-daig.onrender.com/api/v1",
-  baseURL: "http://localhost:3333/api/v1" ,
+  baseURL: "http://localhost:3000/api/v1" ,
   headers: {
     "Content-Type": "application/json",
   },
