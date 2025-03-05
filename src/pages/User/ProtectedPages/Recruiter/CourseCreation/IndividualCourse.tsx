@@ -1,16 +1,42 @@
-"use client"
+"use client";
 
-import ProtectedLayout from "@/components/layouts/ProtectedLayout"
-import api from "../../../../../axiosService"
-import { useQuery } from "@tanstack/react-query"
-import type { CourseSection, IndividualCourseResponse } from "./types"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import type { AxiosError } from "axios";
+import { toast } from "sonner";
+
+import ProtectedLayout from "@/components/layouts/ProtectedLayout";
+import api from "../../../../../axiosService";
+import type { CourseSection, IndividualCourseResponse } from "./types";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   BookOpen,
   Clock,
@@ -27,32 +53,103 @@ import {
   MessageSquare,
   Info,
   ExternalLink,
-} from "lucide-react"
-import { format } from "date-fns"
-import { useSearchParams } from "react-router-dom"
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import EditCourse from "./EditCourse"
+  Loader2,
+  Trash2,
+  CheckCircle2,
+  ChevronRight,
+} from "lucide-react";
+
+import CreateSection from "./CreateSection";
+import CreateSubSection from "./CreateSubSection";
+import EditSection from "./EditSection";
+import EditSubSection from "./EditSubSection";
+import EditCourse from "./EditCourse";
+import ConfirmDialog from "@/helper/ConfirmationDialog";
 
 const IndividualCourse = () => {
-  const [searchParams] = useSearchParams()
-  const id = searchParams.get("id")
-  const [isBookmarked, setIsBookmarked] = useState(false)
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const { data: courseData, isLoading } = useQuery({
+  const {
+    data: courseData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["individualCourse", id],
     queryFn: async () => {
-      const response = await api.get<IndividualCourseResponse>(`/course/individual-course/${id}`)
-      return response.data
+      const response = await api.get<IndividualCourseResponse>(
+        `/course/individual-course/${id}`
+      );
+      return response.data;
     },
-  })
+  });
+
+  const deleteCourseMutation = useMutation({
+    mutationFn: ({ courseId }: { courseId: string }) => {
+      return api.delete(`/course/delete-course/${courseId}`);
+    },
+    onSuccess: () => {
+      toast.success("Course deleted successfully");
+      refetch();
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to delete course");
+    },
+  });
+
+  const deleteSectionMutation = useMutation({
+    mutationFn: ({
+      sectionId,
+      courseId,
+    }: {
+      sectionId: string;
+      courseId: string;
+    }) => {
+      return api.delete(`/course/delete-section/${sectionId}/${courseId}`);
+    },
+    onSuccess: () => {
+      toast.success("Section deleted successfully");
+      refetch();
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to delete section");
+    },
+  });
+
+  const deleteSubSectionMutation = useMutation({
+    mutationFn: ({
+      sectionId,
+      courseId,
+      subsectionId,
+    }: {
+      sectionId: string;
+      courseId: string;
+      subsectionId: string;
+    }) => {
+      return api.delete(
+        `/course/delete-subsection/${subsectionId}/${sectionId}/${courseId}`
+      );
+    },
+    onSuccess: () => {
+      toast.success("Subsection deleted successfully");
+      refetch();
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(
+        error.response?.data?.message || "Failed to delete subsection"
+      );
+    },
+  });
 
   // Calculate total lessons
   const getTotalLessons = (course) => {
-    if (!course) return 0
-    return course.courseSections.reduce((total, section) => total + section.subSections.length, 0)
-  }
+    if (!course) return 0;
+    return course.courseSections.reduce(
+      (total, section) => total + section.subSections.length,
+      0
+    );
+  };
 
   // Mock data for reviews and students
   const mockReviews = [
@@ -70,55 +167,108 @@ const IndividualCourse = () => {
       user: "Sarah Miller",
       avatar: null,
       rating: 4,
-      comment: "Great course overall. Some sections could use more examples, but the knowledge gained is invaluable.",
+      comment:
+        "Great course overall. Some sections could use more examples, but the knowledge gained is invaluable.",
       date: "2023-09-28",
     },
-  ]
+  ];
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 space-y-6">
+      <div className="container mx-auto p-4 md:p-6 space-y-6">
         <Skeleton className="h-[300px] w-full rounded-xl" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="h-[200px] col-span-2" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          <Skeleton className="h-[200px] lg:col-span-2" />
           <Skeleton className="h-[200px]" />
         </div>
       </div>
-    )
+    );
   }
 
-  const course = courseData?.data
+  const course = courseData?.data;
 
   if (!course) {
     return (
-      <div className="container mx-auto p-6 flex flex-col items-center justify-center min-h-[50vh]">
-        <Info className="w-16 h-16 text-muted-foreground mb-4" />
+      <div className="container mx-auto p-4 md:p-6 flex flex-col items-center justify-center min-h-[50vh]">
+        <div className="bg-muted/30 rounded-full p-6 mb-6">
+          <Info className="w-12 h-12 text-muted-foreground" />
+        </div>
         <h2 className="text-2xl font-bold mb-2">Course Not Found</h2>
-        <p className="text-muted-foreground mb-6">The course you're looking for doesn't exist or has been removed.</p>
-        <Button>Browse Courses</Button>
+        <p className="text-muted-foreground mb-6 text-center max-w-md">
+          The course you're looking for doesn't exist or has been removed.
+        </p>
+        <Button size="lg">Browse Courses</Button>
       </div>
-    )
+    );
   }
 
-  const totalLessons = getTotalLessons(course)
+  const totalLessons = getTotalLessons(course);
 
   return (
     <ProtectedLayout>
-      <div className="container mx-auto p-6">
+      <div className="container mx-auto p-4 md:p-6">
         {/* Hero Section */}
         <div className="relative w-full rounded-xl overflow-hidden mb-8 bg-gradient-to-r from-primary/10 to-secondary/10">
-          <div className="absolute inset-0 bg-black/40 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30 z-10"></div>
           <img
-            src={course.courseThumbnail || "/placeholder.svg"}
+            src={
+              course.courseThumbnail || "/placeholder.svg?height=400&width=1200"
+            }
             alt={course.title}
-            className="w-full h-[300px] object-cover"
+            className="w-full h-[300px] md:h-[400px] object-cover"
           />
+          <div className="absolute bottom-0 left-0 right-0 p-4 md:p-8 z-20">
+            <div className="flex flex-wrap gap-2 mb-3">
+              <Badge
+                variant="secondary"
+                className="bg-primary/20 text-primary-foreground"
+              >
+                {course.category}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="bg-background/20 backdrop-blur-sm"
+              >
+                {totalLessons} lessons
+              </Badge>
+            </div>
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
+              {course.title}
+            </h1>
+            <p className="text-white/80 max-w-2xl mb-4 line-clamp-2">
+              {course.description}
+            </p>
+            <div className="flex items-center gap-3">
+              <Avatar className="border-2 border-white">
+                <AvatarImage src="/placeholder.svg?height=40&width=40" />
+                <AvatarFallback>{course.instructor.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-white font-medium">{course.instructor}</p>
+                <p className="text-white/70 text-sm">Course Instructor</p>
+              </div>
+            </div>
+          </div>
         </div>
-          <EditCourse course={courseData} />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
-          <div className="col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold">{course.title}</h2>
+              <div className="flex gap-2">
+                <EditCourse course={courseData} />
+                <ConfirmDialog
+                  title="Delete Course"
+                  message="Are you sure you want to delete this course?"
+                  onConfirm={() =>
+                    deleteCourseMutation.mutate({ courseId: course._id })
+                  }
+                  trigger={<Button>Delete Course</Button>}
+                />
+              </div>
+            </div>
+
             {/* Tabs Navigation */}
             <Tabs defaultValue="content" className="w-full">
               <TabsList className="w-full justify-start mb-6 bg-background border-b rounded-none h-auto p-0">
@@ -142,70 +292,175 @@ const IndividualCourse = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="content" className="mt-0">
+              <TabsContent value="content" className="mt-0 space-y-6">
                 {/* Course Progress */}
-                <Card className="mb-6">
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col gap-2">
+                <Card className="overflow-hidden border-none shadow-md">
+                  <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
+                    <div className="flex flex-col gap-3">
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-primary" />
+                        Your Progress
+                      </h3>
                       <div className="flex justify-between items-center">
-                        <h3 className="font-medium">Your Progress</h3>
-                        <span className="text-sm text-muted-foreground">0%</span>
+                        <span className="text-sm font-medium">0% complete</span>
+                        <span className="text-sm text-muted-foreground">
+                          0/{totalLessons} lessons
+                        </span>
                       </div>
                       <Progress value={0} className="h-2" />
-                      <p className="text-sm text-muted-foreground">Start learning to track your progress</p>
+                      <p className="text-sm text-muted-foreground">
+                        Start learning to track your progress
+                      </p>
                     </div>
-                  </CardContent>
+                  </div>
                 </Card>
 
                 {/* Course Sections */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-semibold flex items-center gap-2">
-                      <BookOpen className="w-6 h-6" />
+                <Card className="border-none shadow-md">
+                  <CardHeader className="bg-muted/30">
+                    <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-primary" />
                       Course Content
                     </CardTitle>
-                    <CardDescription>
-                      {course.courseSections.length} sections • {totalLessons} lessons •{" "}
+                    <CardDescription className="flex flex-wrap justify-between items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <span>{course.courseSections.length} sections</span>
+                        <span>•</span>
+                        <span>{totalLessons} lessons</span>
+                      </div>
+                      <CreateSection courseId={course._id} refetch={refetch} />
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-0">
                     <Accordion type="single" collapsible className="w-full">
-                      {course.courseSections.map((section:CourseSection, index:number) => (
-                        <AccordionItem key={section._id} value={`section-${index}`}>
-                          <AccordionTrigger className="text-lg">
-                            <div className="flex items-center gap-2">
-                              <span>{section.title}</span>
-                              <Badge variant="secondary">{section.subSections.length} lessons</Badge>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent>
-              <div className="space-y-2 pl-4">
-                {section.subSections.map((subsection) => (
-                  <div
-                    key={subsection._id}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-accent/50 group cursor-pointer transition-colors"
-                    onClick={() => window.open(subsection?.videoUrl, '_blank')}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                        <Play className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="font-medium">
-                        {subsection.title}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        Click to watch
-                      </span>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </AccordionContent>
-                        </AccordionItem>
-                      ))}
+                      {course.courseSections.map(
+                        (section: CourseSection, index: number) => (
+                          <AccordionItem
+                            key={section._id}
+                            value={`section-${index}`}
+                            className="border-b last:border-0"
+                          >
+                            <AccordionTrigger className="px-6 py-4 hover:bg-muted/30 transition-colors">
+                              <div className="flex items-center gap-2 text-left">
+                                <span className="font-medium">
+                                  {section.title}
+                                </span>
+                                <Badge variant="secondary" className="ml-2">
+                                  {section.subSections.length} lessons
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-1 ml-auto mr-4">
+                                <CreateSubSection
+                                  courseId={course._id}
+                                  refetch={refetch}
+                                  sectionId={section._id}
+                                />
+                                <EditSection
+                                  section={section}
+                                  refetch={refetch}
+                                />
+
+                                <ConfirmDialog
+                                  message="Do you really want to delete this section? This action will permanently remove it from the database."
+                                  onConfirm={() => {
+                                    deleteSectionMutation.mutate({
+                                      sectionId: section._id,
+                                      courseId: section.course,
+                                    });
+                                  }}
+                                  trigger={
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      disabled={deleteSectionMutation.isPending}
+                                    >
+                                      {deleteSectionMutation.isPending ? (
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </Button>
+                                  }
+                                />
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-0 pb-0">
+                              <div className="divide-y">
+                                {section.subSections.map((subsection) => (
+                                  <div
+                                    key={subsection._id}
+                                    className="flex flex-wrap md:flex-nowrap items-center justify-between p-4 hover:bg-muted/30 transition-colors"
+                                  >
+                                    <div className="flex items-center gap-3 w-full md:w-auto">
+                                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                        <Play className="w-5 h-5 text-primary" />
+                                      </div>
+                                      <div>
+                                        <span className="font-medium block">
+                                          {subsection.title}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                          Video • 10:30 min
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2 mt-3 md:mt-0 w-full md:w-auto justify-end">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8"
+                                        onClick={() =>
+                                          window.open(
+                                            subsection?.videoUrl,
+                                            "_blank"
+                                          )
+                                        }
+                                      >
+                                        <ExternalLink className="w-4 h-4 mr-1" />
+                                        Watch
+                                      </Button>
+
+                                      <EditSubSection
+                                        subSection={subsection}
+                                        refetch={refetch}
+                                      />
+
+                                      <ConfirmDialog
+                                        message="Do you really want to delete this sub-section? This action will permanently remove it from the database."
+                                        onConfirm={() => {
+                                          deleteSubSectionMutation.mutate({
+                                            sectionId: subsection.section,
+                                            subsectionId: subsection._id,
+                                            courseId: subsection.course,
+                                          });
+                                        }}
+                                        trigger={
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            disabled={
+                                              deleteSubSectionMutation.isPending
+                                            }
+                                          >
+                                            {deleteSubSectionMutation.isPending ? (
+                                              <Loader2 className="w-4 h-4 animate-spin" />
+                                            ) : (
+                                              <Trash2 className="w-4 h-4" />
+                                            )}
+                                          </Button>
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        )
+                      )}
                     </Accordion>
                   </CardContent>
                 </Card>
@@ -213,35 +468,42 @@ const IndividualCourse = () => {
 
               <TabsContent value="overview" className="mt-0 space-y-6">
                 {/* Course Description */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-semibold">About This Course</CardTitle>
+                <Card className="border-none shadow-md overflow-hidden">
+                  <CardHeader className="bg-muted/30">
+                    <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                      <Info className="w-5 h-5 text-primary" />
+                      About This Course
+                    </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <div className="prose max-w-none">
-                      <p>{course.description}</p>
+                      <p className="mb-4">{course.description}</p>
                       <p>
-                        This comprehensive course is designed to take you from beginner to proficient in{" "}
-                        {course.category}. Whether you're just starting out or looking to enhance your existing skills,
-                        this course provides the perfect balance of theory and practical examples.
+                        This comprehensive course is designed to take you from
+                        beginner to proficient in {course.category}. Whether
+                        you're just starting out or looking to enhance your
+                        existing skills, this course provides the perfect
+                        balance of theory and practical examples.
                       </p>
                     </div>
                   </CardContent>
                 </Card>
 
                 {/* What You'll Learn */}
-                <Card>
-                  <CardHeader>
+                <Card className="border-none shadow-md overflow-hidden">
+                  <CardHeader className="bg-muted/30">
                     <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                      <Target className="w-5 h-5" />
+                      <Target className="w-5 h-5 text-primary" />
                       What you'll learn
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {course.benifits.map((benefit, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <div className="mt-1 text-primary">•</div>
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="mt-1 bg-primary/10 rounded-full p-1">
+                            <CheckCircle2 className="w-4 h-4 text-primary" />
+                          </div>
                           <span>{benefit}</span>
                         </div>
                       ))}
@@ -250,18 +512,20 @@ const IndividualCourse = () => {
                 </Card>
 
                 {/* Requirements */}
-                <Card>
-                  <CardHeader>
+                <Card className="border-none shadow-md overflow-hidden">
+                  <CardHeader className="bg-muted/30">
                     <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                      <ListChecks className="w-5 h-5" />
+                      <ListChecks className="w-5 h-5 text-primary" />
                       Requirements
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
+                  <CardContent className="p-6">
+                    <ul className="space-y-3">
                       {course.requirements.map((requirement, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <div className="mt-1 text-primary">•</div>
+                        <li key={index} className="flex items-start gap-3">
+                          <div className="mt-1 text-primary">
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
                           <span>{requirement}</span>
                         </li>
                       ))}
@@ -270,25 +534,32 @@ const IndividualCourse = () => {
                 </Card>
 
                 {/* Instructor */}
-                <Card>
-                  <CardHeader>
+                <Card className="border-none shadow-md overflow-hidden">
+                  <CardHeader className="bg-muted/30">
                     <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                      <GraduationCap className="w-5 h-5" />
+                      <GraduationCap className="w-5 h-5 text-primary" />
                       Instructor
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <div className="flex items-start gap-4">
-                      <Avatar className="w-16 h-16">
-                        <AvatarImage src="/placeholder.svg?height=64&width=64" />
-                        <AvatarFallback>{course.instructor.charAt(0)}</AvatarFallback>
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row items-start gap-6">
+                      <Avatar className="w-20 h-20 border">
+                        <AvatarImage src="/placeholder.svg?height=80&width=80" />
+                        <AvatarFallback className="text-xl">
+                          {course.instructor.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="font-medium text-lg">{course.instructor}</h3>
-                        <p className="text-muted-foreground mb-2">Expert in {course.category}</p>
-                        <p className="text-sm">
-                          An experienced instructor with over 10 years of industry experience. Passionate about teaching
-                          and helping students achieve their goals.
+                        <h3 className="font-medium text-xl mb-1">
+                          {course.instructor}
+                        </h3>
+                        <p className="text-primary font-medium mb-3">
+                          Expert in {course.category}
+                        </p>
+                        <p className="text-muted-foreground">
+                          An experienced instructor with over 10 years of
+                          industry experience. Passionate about teaching and
+                          helping students achieve their goals.
                         </p>
                       </div>
                     </div>
@@ -298,33 +569,62 @@ const IndividualCourse = () => {
 
               <TabsContent value="reviews" className="mt-0 space-y-6">
                 {/* Reviews Summary */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-2xl font-semibold">Student Reviews</CardTitle>
-                    <CardDescription>See what our students are saying about this course</CardDescription>
+                <Card className="border-none shadow-md overflow-hidden">
+                  <CardHeader className="bg-muted/30">
+                    <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                      <Star className="w-5 h-5 text-primary" />
+                      Student Reviews
+                    </CardTitle>
+                    <CardDescription>
+                      See what our students are saying about this course
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-8">
-                      <div className="flex flex-col items-center justify-center">
+                      <div className="flex flex-col items-center justify-center bg-muted/30 p-6 rounded-lg">
                         <div className="text-5xl font-bold">4.8</div>
                         <div className="flex items-center mt-2">
                           {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                            <Star
+                              key={star}
+                              className="w-5 h-5 text-yellow-400 fill-yellow-400"
+                            />
                           ))}
                         </div>
-                        <div className="text-sm text-muted-foreground mt-1">Course Rating</div>
+                        <div className="text-sm text-muted-foreground mt-1">
+                          Course Rating
+                        </div>
                       </div>
 
                       <div className="flex-1">
                         {[5, 4, 3, 2, 1].map((rating) => (
-                          <div key={rating} className="flex items-center gap-2 mb-1">
-                            <div className="w-12 text-sm text-right">{rating} stars</div>
+                          <div
+                            key={rating}
+                            className="flex items-center gap-3 mb-2"
+                          >
+                            <div className="w-12 text-sm text-right font-medium">
+                              {rating} stars
+                            </div>
                             <Progress
-                              value={rating === 5 ? 75 : rating === 4 ? 20 : rating === 3 ? 5 : 0}
+                              value={
+                                rating === 5
+                                  ? 75
+                                  : rating === 4
+                                  ? 20
+                                  : rating === 3
+                                  ? 5
+                                  : 0
+                              }
                               className="h-2 flex-1"
                             />
-                            <div className="w-12 text-sm">
-                              {rating === 5 ? "75%" : rating === 4 ? "20%" : rating === 3 ? "5%" : "0%"}
+                            <div className="w-12 text-sm font-medium">
+                              {rating === 5
+                                ? "75%"
+                                : rating === 4
+                                ? "20%"
+                                : rating === 3
+                                ? "5%"
+                                : "0%"}
                             </div>
                           </div>
                         ))}
@@ -334,39 +634,56 @@ const IndividualCourse = () => {
                 </Card>
 
                 {/* Review List */}
-                <Card>
-                  <CardContent className="pt-6">
+                <Card className="border-none shadow-md">
+                  <CardContent className="p-6">
                     <div className="space-y-6">
                       {mockReviews.map((review) => (
-                        <div key={review.id} className="pb-6 border-b last:border-0">
+                        <div
+                          key={review.id}
+                          className="p-4 rounded-lg bg-muted/30 mb-4"
+                        >
                           <div className="flex items-start gap-4">
-                            <Avatar>
-                              <AvatarImage src={review.avatar || "/placeholder.svg?height=40&width=40"} />
-                              <AvatarFallback>{review.user.charAt(0)}</AvatarFallback>
+                            <Avatar className="border">
+                              <AvatarImage
+                                src={
+                                  review.avatar ||
+                                  "/placeholder.svg?height=40&width=40"
+                                }
+                              />
+                              <AvatarFallback>
+                                {review.user.charAt(0)}
+                              </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <div className="flex items-center justify-between">
+                              <div className="flex flex-wrap justify-between items-center gap-2">
                                 <h4 className="font-medium">{review.user}</h4>
                                 <span className="text-sm text-muted-foreground">
-                                  {format(new Date(review.date), "MMM dd, yyyy")}
+                                  {format(
+                                    new Date(review.date),
+                                    "MMM dd, yyyy"
+                                  )}
                                 </span>
                               </div>
-                              <div className="flex items-center mt-1">
+                              <div className="flex items-center mt-1 mb-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <Star
                                     key={star}
-                                    className={`w-4 h-4 ${star <= review.rating ? "text-yellow-400 fill-yellow-400" : "text-muted-foreground"}`}
+                                    className={`w-4 h-4 ${
+                                      star <= review.rating
+                                        ? "text-yellow-400 fill-yellow-400"
+                                        : "text-muted-foreground"
+                                    }`}
                                   />
                                 ))}
                               </div>
-                              <p className="mt-2">{review.comment}</p>
+                              <p>{review.comment}</p>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   </CardContent>
-                  <CardFooter>
+                  <CardFooter className="px-6 pb-6 pt-0">
                     <Button variant="outline" className="w-full">
                       Load More Reviews
                     </Button>
@@ -377,35 +694,52 @@ const IndividualCourse = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Course Card */}
-            <Card className="sticky top-6">
+          <div>
+            <Card className="sticky top-6 border-none shadow-md overflow-hidden">
               <CardContent className="p-0">
                 <img
-                  src={course.courseThumbnail || "/placeholder.svg"}
+                  src={
+                    course.courseThumbnail ||
+                    "/placeholder.svg?height=200&width=400"
+                  }
                   alt={course.title}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-6">
                     <div className="text-3xl font-bold flex items-center">
-                      <DollarSign className="w-6 h-6" />
+                      <DollarSign className="w-6 h-6 text-primary" />
                       {course.price}
                     </div>
                   </div>
 
-                  <Button className="w-full mb-3 text-lg py-6">Enroll Now</Button>
+                  <Button className="w-full mb-4 text-lg py-6 bg-primary hover:bg-primary/90">
+                    Enroll Now
+                  </Button>
 
                   <div className="flex justify-between gap-2 mb-6">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" onClick={() => setIsBookmarked(!isBookmarked)}>
-                            <Bookmark className={`w-5 h-5 ${isBookmarked ? "fill-primary" : ""}`} />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                            onClick={() => setIsBookmarked(!isBookmarked)}
+                          >
+                            <Bookmark
+                              className={`w-5 h-5 ${
+                                isBookmarked ? "fill-primary text-primary" : ""
+                              }`}
+                            />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{isBookmarked ? "Remove from wishlist" : "Add to wishlist"}</p>
+                          <p>
+                            {isBookmarked
+                              ? "Remove from wishlist"
+                              : "Add to wishlist"}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -413,7 +747,11 @@ const IndividualCourse = () => {
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-10 w-10"
+                          >
                             <Share2 className="w-5 h-5" />
                           </Button>
                         </TooltipTrigger>
@@ -423,29 +761,39 @@ const IndividualCourse = () => {
                       </Tooltip>
                     </TooltipProvider>
 
-                    <Button variant="outline" className="flex-1">
+                    <Button variant="outline" className="flex-1 h-10">
                       <MessageSquare className="w-5 h-5 mr-2" />
                       Contact Instructor
                     </Button>
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="font-medium">This course includes:</h3>
-                    <ul className="space-y-3">
-                      <li className="flex items-center gap-2 text-sm">
-                        <FileVideo className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="font-medium text-lg">
+                      This course includes:
+                    </h3>
+                    <ul className="space-y-4">
+                      <li className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <FileVideo className="w-5 h-5 text-primary" />
+                        </div>
                         <span>{totalLessons} on-demand video lessons</span>
                       </li>
-                      <li className="flex items-center gap-2 text-sm">
-                        <Download className="w-4 h-4 text-muted-foreground" />
+                      <li className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <Download className="w-5 h-5 text-primary" />
+                        </div>
                         <span>Downloadable resources</span>
                       </li>
-                      <li className="flex items-center gap-2 text-sm">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
+                      <li className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <Clock className="w-5 h-5 text-primary" />
+                        </div>
                         <span>Full lifetime access</span>
                       </li>
-                      <li className="flex items-center gap-2 text-sm">
-                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                      <li className="flex items-center gap-3">
+                        <div className="bg-primary/10 p-2 rounded-full">
+                          <GraduationCap className="w-5 h-5 text-primary" />
+                        </div>
                         <span>Certificate of completion</span>
                       </li>
                     </ul>
@@ -457,8 +805,7 @@ const IndividualCourse = () => {
         </div>
       </div>
     </ProtectedLayout>
-  )
-}
+  );
+};
 
-export default IndividualCourse
-
+export default IndividualCourse;

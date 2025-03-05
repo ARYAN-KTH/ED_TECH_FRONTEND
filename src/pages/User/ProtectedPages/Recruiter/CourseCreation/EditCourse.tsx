@@ -321,7 +321,7 @@ const EditCourse = ({ course }: { course: IndividualCourseResponse }) => {
                       className="mt-2"
                       disabled={!thumbnailPreview}
                     >
-                      View Full Size
+                      View Previous Thumbnail
                     </Button>
                   </div>
                 </div>

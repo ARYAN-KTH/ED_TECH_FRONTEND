@@ -48,7 +48,7 @@ const CreateSection = ({courseId, refetch}: {courseId: string, refetch: () => vo
   return (
     <div>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>  
-        <DialogTrigger><Button><Plus className="w-4 h-4 mr-2" />Create a Section</Button></DialogTrigger>
+        <DialogTrigger><Button>Add Section</Button></DialogTrigger>
         <DialogContent>
           <DialogTitle>Create a Section</DialogTitle>
           <form onSubmit={handleSubmit(sectionHandler)} className="space-y-4">
