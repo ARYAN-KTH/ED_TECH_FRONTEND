@@ -53,7 +53,7 @@ const LoginScreen = () => {
       if(activeTab === "Instructor"){
         Navigate("/create-course-step1");
       }else{
-        Navigate("/Home");
+        Navigate("/create-course-step1");
       }
     },
     onError: (error: AxiosError<ApiResponse>) => {

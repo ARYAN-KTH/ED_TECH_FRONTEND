@@ -66,6 +66,7 @@ import EditSubSection from "./EditSubSection";
 import EditCourse from "./EditCourse";
 import ConfirmDialog from "@/helper/ConfirmationDialog";
 
+
 const IndividualCourse = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
@@ -203,6 +204,61 @@ const IndividualCourse = () => {
   }
 
   const totalLessons = getTotalLessons(course);
+
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+  
+
+
+  const handlePayment = async () => {
+    const res = await fetch("http://localhost:3000/api/v1/course/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: 500, currency: "INR" }),
+    });
+
+    console.log("Response:", res);
+  
+    const orderData = await res.json();
+
+    console.log("Order Data:", orderData);
+  
+    if (!(await loadRazorpayScript())) {
+      alert("Razorpay SDK failed to load.");
+      return;
+    }
+
+    console.log("Order Data:", orderData);
+  
+    const options = {
+      key: "rzp_test_mr5aVn2tvekqLL", // Public Key
+      amount: orderData.amount,
+      currency: orderData.currency,
+      name: "Your App Name",
+      description: "Test Transaction",
+      order_id: orderData.id,
+      handler: function (response) {
+        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+      },
+      prefill: {
+        name: "Aryan",
+        email: "aryan@example.com",
+        contact: "7296967119",
+      },
+      theme: { color: "#3399cc" },
+    };
+  
+    const paymentObject = new window.Razorpay(options);
+    paymentObject.open();
+  };
+  
 
   return (
     <ProtectedLayout>
@@ -713,7 +769,7 @@ const IndividualCourse = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full mb-4 text-lg py-6 bg-primary hover:bg-primary/90">
+                  <Button className="w-full mb-4 text-lg py-6 bg-primary hover:bg-primary/90" onClick={handlePayment}>
                     Enroll Now
                   </Button>
 
