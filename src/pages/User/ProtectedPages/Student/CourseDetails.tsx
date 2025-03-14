@@ -1,11 +1,8 @@
-"use client";
-
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../../axiosService";
 import ProtectedLayout from "@/components/layouts/ProtectedLayout";
-
 
 import {
   Card,
@@ -51,18 +48,19 @@ import {
   CheckCircle2,
   ChevronRight,
 } from "lucide-react";
-import { CourseSection, IndividualCourseResponse } from "../Recruiter/CourseCreation/types";
+import {
+  CourseSection,
+  IndividualCourseResponse,
+} from "../Recruiter/CourseCreation/types";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 const CourseDetails = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const {
-    data: courseData,
-    isLoading,
-  } = useQuery({
+  const { data: courseData, isLoading } = useQuery({
     queryKey: ["individualCourse", id],
     queryFn: async () => {
       const response = await api.get<IndividualCourseResponse>(
@@ -71,9 +69,6 @@ const CourseDetails = () => {
       return response.data;
     },
   });
-
- 
-
 
   // Calculate total lessons
   const getTotalLessons = (course) => {
@@ -148,18 +143,15 @@ const CourseDetails = () => {
   };
 
   const handlePayment = async () => {
-    const res = await fetch(
-      "http://localhost:3000/api/v1/course/create-order",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 500, currency: "INR" }),
-      }
-    );
+    const res = await api.post("/course/create-order", {
+      amount: 50,
+      currency: "INR",
+      courseId: course._id,
+    });
 
     console.log("Response:", res);
 
-    const orderData = await res.json();
+    const orderData = await res.data;
 
     console.log("Order Data:", orderData);
 
@@ -177,10 +169,21 @@ const CourseDetails = () => {
       name: "Your App Name",
       description: "Test Transaction",
       order_id: orderData.id,
-      handler: function (response) {
-        alert(
-          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-        );
+      handler: function (response: any) {
+        const verifyPayment = async () => {
+          try {
+            const res = await api.post("/course/verify-payment", {
+              response,
+            });
+
+            toast.success("Payment successful");
+          } catch (error) {
+            toast.error("Payment verification failed");
+            return null;
+          }
+        };
+        verifyPayment();
+        
       },
       prefill: {
         name: "Aryan",
@@ -344,7 +347,6 @@ const CourseDetails = () => {
                                         </span>
                                       </div>
                                     </div>
-
                                   </div>
                                 ))}
                               </div>
