@@ -169,16 +169,18 @@ const CourseDetails = () => {
       name: "Your App Name",
       description: "Test Transaction",
       order_id: orderData.id,
-      handler: function (response: any) {
+      handler: function (response: {razorpay_payment_id: string,razorpay_order_id: string,razorpay_signature: string}) {
         const verifyPayment = async () => {
           try {
             const res = await api.post("/course/verify-payment", {
               response,
             });
 
+            console.log("Payment Response:", res);
+
             toast.success("Payment successful");
           } catch (error) {
-            toast.error("Payment verification failed");
+            toast.error("Payment verification failed",error.message);
             return null;
           }
         };
