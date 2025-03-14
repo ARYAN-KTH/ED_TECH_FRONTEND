@@ -37,10 +37,11 @@ const refreshAccessToken = async () => {
 
 // Create an Axios instance
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1" // Replace with your backend's base URL
-  // headers: {
-  //   "Content-Type": "application/json",
-  // },
+  baseURL: "https://ed-tech-backend-daig.onrender.com/api/v1",
+  // baseURL: "http://localhost:3000/api/v1" ,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Request Interceptor

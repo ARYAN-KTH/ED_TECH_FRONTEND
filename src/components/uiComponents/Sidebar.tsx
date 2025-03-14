@@ -17,7 +17,7 @@ import {
 const items = [
   {
     title: "Dashboard",
-    url: "#",
+    url: "/create-course",
     icon: Home,
   },
   {
@@ -27,7 +27,7 @@ const items = [
   },
   {
     title: "My Courses",
-    url: "#",
+    url: "/create-course",
     icon: Calendar,
   },
   {

@@ -1,15 +1,8 @@
-"use client";
-
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import type { AxiosError } from "axios";
-import { toast } from "sonner";
-
+import { useQuery } from "@tanstack/react-query";
+import api from "../../../../axiosService";
 import ProtectedLayout from "@/components/layouts/ProtectedLayout";
-import api from "../../../../../axiosService";
-import type { CourseSection, IndividualCourseResponse } from "./types";
 
 import {
   Card,
@@ -52,94 +45,28 @@ import {
   Download,
   MessageSquare,
   Info,
-  ExternalLink,
-  Loader2,
-  Trash2,
   CheckCircle2,
   ChevronRight,
 } from "lucide-react";
+import {
+  CourseSection,
+  IndividualCourseResponse,
+} from "../Recruiter/CourseCreation/types";
+import { format } from "date-fns";
+import { toast } from "sonner";
 
-import CreateSection from "./CreateSection";
-import CreateSubSection from "./CreateSubSection";
-import EditSection from "./EditSection";
-import EditSubSection from "./EditSubSection";
-import EditCourse from "./EditCourse";
-import ConfirmDialog from "@/helper/ConfirmationDialog";
-
-
-const IndividualCourse = () => {
+const CourseDetails = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  const {
-    data: courseData,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: courseData, isLoading } = useQuery({
     queryKey: ["individualCourse", id],
     queryFn: async () => {
       const response = await api.get<IndividualCourseResponse>(
         `/course/individual-course/${id}`
       );
       return response.data;
-    },
-  });
-
-  const deleteCourseMutation = useMutation({
-    mutationFn: ({ courseId }: { courseId: string }) => {
-      return api.delete(`/course/delete-course/${courseId}`);
-    },
-    onSuccess: () => {
-      toast.success("Course deleted successfully");
-      refetch();
-    },
-    onError: (error: AxiosError<{ message?: string }>) => {
-      toast.error(error.response?.data?.message || "Failed to delete course");
-    },
-  });
-
-  const deleteSectionMutation = useMutation({
-    mutationFn: ({
-      sectionId,
-      courseId,
-    }: {
-      sectionId: string;
-      courseId: string;
-    }) => {
-      return api.delete(`/course/delete-section/${sectionId}/${courseId}`);
-    },
-    onSuccess: () => {
-      toast.success("Section deleted successfully");
-      refetch();
-    },
-    onError: (error: AxiosError<{ message?: string }>) => {
-      toast.error(error.response?.data?.message || "Failed to delete section");
-    },
-  });
-
-  const deleteSubSectionMutation = useMutation({
-    mutationFn: ({
-      sectionId,
-      courseId,
-      subsectionId,
-    }: {
-      sectionId: string;
-      courseId: string;
-      subsectionId: string;
-    }) => {
-      return api.delete(
-        `/course/delete-subsection/${subsectionId}/${sectionId}/${courseId}`
-      );
-    },
-    onSuccess: () => {
-      toast.success("Subsection deleted successfully");
-      refetch();
-    },
-    onError: (error: AxiosError<{ message?: string }>) => {
-      toast.error(
-        error.response?.data?.message || "Failed to delete subsection"
-      );
     },
   });
 
@@ -214,29 +141,27 @@ const IndividualCourse = () => {
       document.body.appendChild(script);
     });
   };
-  
-
 
   const handlePayment = async () => {
-    const res = await fetch("http://localhost:3000/api/v1/course/create-order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 500, currency: "INR" }),
+    const res = await api.post("/course/create-order", {
+      amount: 50,
+      currency: "INR",
+      courseId: course._id,
     });
 
     console.log("Response:", res);
-  
-    const orderData = await res.json();
+
+    const orderData = await res.data;
 
     console.log("Order Data:", orderData);
-  
+
     if (!(await loadRazorpayScript())) {
       alert("Razorpay SDK failed to load.");
       return;
     }
 
     console.log("Order Data:", orderData);
-  
+
     const options = {
       key: "rzp_test_mr5aVn2tvekqLL", // Public Key
       amount: orderData.amount,
@@ -244,8 +169,23 @@ const IndividualCourse = () => {
       name: "Your App Name",
       description: "Test Transaction",
       order_id: orderData.id,
-      handler: function (response) {
-        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+      handler: function (response: {razorpay_payment_id: string,razorpay_order_id: string,razorpay_signature: string}) {
+        const verifyPayment = async () => {
+          try {
+            const res = await api.post("/course/verify-payment", {
+              response,
+            });
+
+            console.log("Payment Response:", res);
+
+            toast.success("Payment successful");
+          } catch (error) {
+            toast.error("Payment verification failed",error.message);
+            return null;
+          }
+        };
+        verifyPayment();
+        
       },
       prefill: {
         name: "Aryan",
@@ -254,11 +194,10 @@ const IndividualCourse = () => {
       },
       theme: { color: "#3399cc" },
     };
-  
+
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
   };
-  
 
   return (
     <ProtectedLayout>
@@ -310,21 +249,6 @@ const IndividualCourse = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">{course.title}</h2>
-              <div className="flex gap-2">
-                <EditCourse course={courseData} />
-                <ConfirmDialog
-                  title="Delete Course"
-                  message="Are you sure you want to delete this course?"
-                  onConfirm={() =>
-                    deleteCourseMutation.mutate({ courseId: course._id })
-                  }
-                  trigger={<Button>Delete Course</Button>}
-                />
-              </div>
-            </div>
-
             {/* Tabs Navigation */}
             <Tabs defaultValue="content" className="w-full">
               <TabsList className="w-full justify-start mb-6 bg-background border-b rounded-none h-auto p-0">
@@ -384,7 +308,6 @@ const IndividualCourse = () => {
                         <span>•</span>
                         <span>{totalLessons} lessons</span>
                       </div>
-                      <CreateSection courseId={course._id} refetch={refetch} />
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-0">
@@ -404,41 +327,6 @@ const IndividualCourse = () => {
                                 <Badge variant="secondary" className="ml-2">
                                   {section.subSections.length} lessons
                                 </Badge>
-                              </div>
-                              <div className="flex items-center gap-1 ml-auto mr-4">
-                                <CreateSubSection
-                                  courseId={course._id}
-                                  refetch={refetch}
-                                  sectionId={section._id}
-                                />
-                                <EditSection
-                                  section={section}
-                                  refetch={refetch}
-                                />
-
-                                <ConfirmDialog
-                                  message="Do you really want to delete this section? This action will permanently remove it from the database."
-                                  onConfirm={() => {
-                                    deleteSectionMutation.mutate({
-                                      sectionId: section._id,
-                                      courseId: section.course,
-                                    });
-                                  }}
-                                  trigger={
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                      disabled={deleteSectionMutation.isPending}
-                                    >
-                                      {deleteSectionMutation.isPending ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="w-4 h-4" />
-                                      )}
-                                    </Button>
-                                  }
-                                />
                               </div>
                             </AccordionTrigger>
                             <AccordionContent className="px-0 pb-0">
@@ -460,55 +348,6 @@ const IndividualCourse = () => {
                                           Video • 10:30 min
                                         </span>
                                       </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 mt-3 md:mt-0 w-full md:w-auto justify-end">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-8"
-                                        onClick={() =>
-                                          window.open(
-                                            subsection?.videoUrl,
-                                            "_blank"
-                                          )
-                                        }
-                                      >
-                                        <ExternalLink className="w-4 h-4 mr-1" />
-                                        Watch
-                                      </Button>
-
-                                      <EditSubSection
-                                        subSection={subsection}
-                                        refetch={refetch}
-                                      />
-
-                                      <ConfirmDialog
-                                        message="Do you really want to delete this sub-section? This action will permanently remove it from the database."
-                                        onConfirm={() => {
-                                          deleteSubSectionMutation.mutate({
-                                            sectionId: subsection.section,
-                                            subsectionId: subsection._id,
-                                            courseId: subsection.course,
-                                          });
-                                        }}
-                                        trigger={
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                            disabled={
-                                              deleteSubSectionMutation.isPending
-                                            }
-                                          >
-                                            {deleteSubSectionMutation.isPending ? (
-                                              <Loader2 className="w-4 h-4 animate-spin" />
-                                            ) : (
-                                              <Trash2 className="w-4 h-4" />
-                                            )}
-                                          </Button>
-                                        }
-                                      />
                                     </div>
                                   </div>
                                 ))}
@@ -769,7 +608,10 @@ const IndividualCourse = () => {
                     </div>
                   </div>
 
-                  <Button className="w-full mb-4 text-lg py-6 bg-primary hover:bg-primary/90" onClick={handlePayment}>
+                  <Button
+                    className="w-full mb-4 text-lg py-6 bg-primary hover:bg-primary/90"
+                    onClick={handlePayment}
+                  >
                     Enroll Now
                   </Button>
 
@@ -864,4 +706,4 @@ const IndividualCourse = () => {
   );
 };
 
-export default IndividualCourse;
+export default CourseDetails;

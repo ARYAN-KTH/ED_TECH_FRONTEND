@@ -30,9 +30,14 @@ export default function CreateCourseStep2() {
   const navigate = useNavigate();
 
   const handlePublishCourse = () => {
+    if(sectionData?.data.length === 0 ) {
+      toast.error("Please add at least one section");
+      return;
+    }
     toast.success("Course published successfully");
     navigate(`/create-course`);
   };
+
 
   const {
     data: sectionData,
