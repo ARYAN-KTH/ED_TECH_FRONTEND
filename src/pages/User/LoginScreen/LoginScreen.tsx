@@ -134,9 +134,9 @@ const LoginScreen = () => {
                   !
                 </span>
               </div>
-              <Button onClick={googleLoginHandler}>
+{/*               <Button onClick={googleLoginHandler}>
                 login with Google
-              </Button>
+              </Button> */}
             </form>
           </div>
         </div>
