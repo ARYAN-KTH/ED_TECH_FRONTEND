@@ -179,9 +179,9 @@ const SignUpScreen = () => {
                   </Link>
                   !
                 </span>
-                <Button onClick={googleSignupHandler}>
+{/*                 <Button onClick={googleSignupHandler}>
                  Signup with Google
-                </Button>
+                </Button> */}
               </div>
             </form>
           </div>
