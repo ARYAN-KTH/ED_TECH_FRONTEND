@@ -24,11 +24,13 @@ const SignUpScreen = () => {
     formState: { errors },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("Student");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const googleSignupHandler = async () => {
     try {
       const result = await signInWithGoogle();

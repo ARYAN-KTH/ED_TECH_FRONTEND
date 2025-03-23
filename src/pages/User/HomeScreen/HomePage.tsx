@@ -1,19 +1,24 @@
-
-import { Book, Users, Award, ArrowRight } from "lucide-react"
-import Navbar from "@/components/uiComponents/Navbar"
-import { Link } from "react-router-dom"
+import { Book, Users, Award, ArrowRight } from "lucide-react";
+import Navbar from "@/components/uiComponents/Navbar";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <Navbar/>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="bg-blue-600 text-white py-20">
         <div className="container mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Learn Anytime, Anywhere</h1>
-          <p className="text-xl mb-8">Unlock your potential with our cutting-edge online learning platform</p>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            Learn Anytime, Anywhere
+          </h1>
+          <p className="text-xl mb-8">
+            Unlock your potential with our cutting-edge online learning platform
+          </p>
           <button className="bg-white text-blue-600 px-6 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition duration-300">
             Get Started
           </button>
@@ -23,7 +28,9 @@ const HomePage: React.FC = () => {
       {/* Features Section */}
       <section className="py-20">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose Study Notion?</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Why Choose Study Notion?
+          </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard
               icon={<Book className="w-12 h-12 text-blue-600" />}
@@ -47,7 +54,9 @@ const HomePage: React.FC = () => {
       {/* Testimonial Section */}
       <section className="bg-gray-200 py-20">
         <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">What Our Students Say</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            What Our Students Say
+          </h2>
           <div className="grid md:grid-cols-2 gap-8">
             <TestimonialCard
               name="Sarah Johnson"
@@ -66,9 +75,15 @@ const HomePage: React.FC = () => {
       {/* CTA Section */}
       <section className="bg-blue-600 text-white py-20">
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Learning Journey?</h2>
-          <p className="text-xl mb-8">Join thousands of students already learning on Study Notion</p>
-          <button className="bg-white text-blue-600 px-6 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-flex items-center">
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Start Your Learning Journey?
+          </h2>
+          <p className="text-xl mb-8">
+            Join thousands of students already learning on Study Notion
+          </p>
+          <button className="bg-white text-blue-600 px-6 py-3 rounded-md text-lg font-semibold hover:bg-gray-100 transition duration-300 inline-flex items-center"
+          onClick={() => navigate("/login")}
+          >
             Explore Courses <ArrowRight className="ml-2" />
           </button>
         </div>
@@ -128,32 +143,35 @@ const HomePage: React.FC = () => {
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};
 
-const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({
-  icon,
-  title,
-  description,
-}) => {
+const FeatureCard: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}> = ({ icon, title, description }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md text-center">
       <div className="flex justify-center mb-4">{icon}</div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-gray-600">{description}</p>
     </div>
-  )
-}
+  );
+};
 
-const TestimonialCard: React.FC<{ name: string; role: string; content: string }> = ({ name, role, content }) => {
+const TestimonialCard: React.FC<{
+  name: string;
+  role: string;
+  content: string;
+}> = ({ name, role, content }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <p className="text-gray-600 mb-4">"{content}"</p>
       <div className="font-semibold">{name}</div>
       <div className="text-sm text-gray-500">{role}</div>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
-
+export default HomePage;

@@ -1,4 +1,3 @@
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import { ChevronLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -40,7 +39,10 @@ const CreateCourseStep1 = () => {
     defaultValues: {
       price: 0,
       category: "Web Development",
+      benifits: [],
+      requirements: [],
     },
+    mode: "onChange",
   });
 
   const category = watch("category");
@@ -121,7 +123,7 @@ const CreateCourseStep1 = () => {
   };
 
   return (
-    <ProtectedLayout>
+
       <div className="max-w-4xl mx-auto px-4">
         <div
           className="flex items-center mb-8"
@@ -291,30 +293,42 @@ const CreateCourseStep1 = () => {
               <label className="text-sm font-medium text-gray-700">
                 Course Benefits *
               </label>
-              <Input
-                value={newBenefit}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter benefit"
-              />
+              <div className="flex space-x-2">
+                <Input
+                  value={newBenefit}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter benefit"
+                />
+                <Button 
+                  onClick={handleAddBenefit} 
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
               {errors.benifits && (
-                <p className="text-red-500">{errors.benifits.message}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.benifits.message}</p>
               )}
-              <Button className="mt-2" onClick={handleAddBenefit} type="button">
-                <Plus className="h-4 w-4" />
-                Add Benefit
-              </Button>
 
               <div className="mt-4">
                 {/* Display the list of benefits */}
-                {benefits.length > 0 && (
-                  <ul>
-                    {benefits.map((benefit, index) => (
-                      <li key={index} className="text-sm text-gray-600">
-                        {benefit}
-                      </li>
-                    ))}
-                  </ul>
+                {benefits.length > 0 ? (
+                  <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Added Benefits:</h4>
+                    <ul className="space-y-1">
+                      {benefits.map((benefit, index) => (
+                        <li key={index} className="flex items-center text-sm text-gray-600">
+                          <span className="inline-block w-4 h-4 bg-blue-500 rounded-full mr-2"></span>
+                          {benefit}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No benefits added yet. Please add at least one benefit.</p>
                 )}
               </div>
             </div>
@@ -323,31 +337,41 @@ const CreateCourseStep1 = () => {
               <label className="text-sm font-medium text-gray-700">
                 Course Requirements *
               </label>
-              <Input
-                value={newRequirement}
-                onChange={handleRequirementChange}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter Requirements"
-              />
+              <div className="flex space-x-2">
+                <Input
+                  value={newRequirement}
+                  onChange={handleRequirementChange}
+                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter Requirements"
+                />
+                <Button
+                  onClick={handleAddRequirement}
+                  type="button"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
               {errors.requirements && (
-                <p className="text-red-500">{errors.requirements.message}</p>
+                <p className="text-red-500 text-sm mt-1">{errors.requirements.message}</p>
               )}
-              <Button
-                className="mt-2"
-                onClick={handleAddRequirement}
-                type="button"
-              >
-                <Plus className="h-4 w-4" />
-                Add Requirement
-              </Button>
-              <div>
-                <ul>
-                  {requirements.map((requirement, index) => (
-                    <li key={index} className="text-sm text-gray-600">
-                      {requirement}
-                    </li>
-                  ))}
-                </ul>
+              <div className="mt-4">
+                {requirements.length > 0 ? (
+                  <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Added Requirements:</h4>
+                    <ul className="space-y-1">
+                      {requirements.map((requirement, index) => (
+                        <li key={index} className="flex items-center text-sm text-gray-600">
+                          <span className="inline-block w-4 h-4 bg-green-500 rounded-full mr-2"></span>
+                          {requirement}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No requirements added yet. Please add at least one requirement.</p>
+                )}
               </div>
             </div>
 
@@ -371,7 +395,6 @@ const CreateCourseStep1 = () => {
           </form>
         </Card>
       </div>
-    </ProtectedLayout>
   );
 };
 

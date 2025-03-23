@@ -17,9 +17,9 @@ const formSchema = z.object({
 
   phone: z
     .string()
-    .min(10, "Phone number must be at least 10 digits")
-    .max(15, "Phone number is too long")
-    .regex(/^\d+$/, "Phone number must contain only numbers"), // Only numbers
+    .min(1, "Phone number must be at least 10 digits")
+    .max(13, "Phone number is too long")
+    .regex(/^(?:\+91|91|0)?[6-9]\d{9}$/, "Invalid mobile number"), // Only numbers
 
   googleAuth: z.boolean().optional(), // Optional boolean
 

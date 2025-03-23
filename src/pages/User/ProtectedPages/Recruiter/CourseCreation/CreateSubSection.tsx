@@ -19,9 +19,11 @@ import { useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PlusCircle, Upload, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const CreateSubSection = ({ sectionId, courseId, refetch }: { sectionId: string, courseId: string, refetch: () => void }) => {
   const navigate = useNavigate();
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
   const {
     register,
     handleSubmit,
@@ -59,6 +61,7 @@ const CreateSubSection = ({ sectionId, courseId, refetch }: { sectionId: string,
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setValue("videoUrl", file);
+      setSelectedFileName(file.name);
     }
   };
 
@@ -124,6 +127,26 @@ const CreateSubSection = ({ sectionId, courseId, refetch }: { sectionId: string,
                 />
               </label>
             </div>
+            {selectedFileName && (
+              <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded flex items-center">
+                <div className="flex-1 truncate">
+                  <p className="text-sm font-medium text-blue-700">Selected file:</p>
+                  <p className="text-sm text-blue-600 truncate">{selectedFileName}</p>
+                </div>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  onClick={() => {
+                    setSelectedFileName("");
+                    setValue("videoUrl", undefined);
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            )}
             {errors.videoUrl && (
               <p className="text-red-500 text-sm">{errors.videoUrl.message}</p>
             )}

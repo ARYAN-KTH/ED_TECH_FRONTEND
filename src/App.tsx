@@ -14,6 +14,10 @@ import CreateCourseStep2 from "./pages/User/ProtectedPages/Recruiter/CourseCreat
 import NotFound from "./pages/NotFound";
 import Courses from "./pages/User/ProtectedPages/Student/Course";
 import CourseDetails from "./pages/User/ProtectedPages/Student/CourseDetails";
+import Layout from "./components/layouts/layout";
+import Dashboard from "./pages/User/ProtectedPages/Recruiter/Dashboard/Dashboard";
+import EnrolledCourse from "./pages/User/ProtectedPages/Student/Enrolled-Course";
+import PurchaseHistory from "./pages/User/ProtectedPages/Student/Purchase-History";
 
 const App = () => {
   return (
@@ -26,25 +30,30 @@ const App = () => {
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/logout" element={<LogoutPage />} />
           <Route path="/" element={<HomePage />} />
-            <Route path="/about-us" element={<AboutUsPage />} />
-            <Route path="/course" element={<CoursePage />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/course" element={<CoursePage />} />
 
-          {/* protected routes */}
+          {/* protected routes with Layout as parent */}
           <Route element={<ProtectedRoute />}>
-            <Route
-              path="/create-course-step1"
-              element={<CreateCourseStep1 />}
-            />
-            <Route
-              path="/create-course-step2"
-              element={<CreateCourseStep2 />}
-            />
-            <Route path="/create-course" element={<CreateCourse />} />
-            <Route path="/individual-course" element={<IndividualCourse />} />
+            <Route element={<Layout />}>
+              <Route
+                path="/create-course-step1"
+                element={<CreateCourseStep1 />}
+              />
+              <Route
+                path="/create-course-step2"
+                element={<CreateCourseStep2 />}
+              />
+              <Route path="/create-course" element={<CreateCourse />} />
+              <Route path="/individual-course" element={<IndividualCourse />} />
+              <Route path="/dashboard" element={<Dashboard />} />
 
-            {/* protected student routes */}
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/course-details" element={<CourseDetails />} />
+              {/* protected student routes */}
+              <Route path="/courses" element={<Courses />} />
+              <Route path="/course-details" element={<CourseDetails />} />
+              <Route path="/enrolled-course" element={<EnrolledCourse />} />
+              <Route path="/purchase-history" element={<PurchaseHistory />} />
+            </Route>
           </Route>
 
           {/* 404 Not Found Route (Always keep it at the end) */}

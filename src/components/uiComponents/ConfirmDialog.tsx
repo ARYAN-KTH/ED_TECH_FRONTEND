@@ -16,6 +16,7 @@ import {
   const ConfirmDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
     const mutation = useMutation({
       mutationFn: () => {
@@ -56,7 +57,14 @@ import {
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button variant="outline" onClick={() => navigate("/create-course-step1")}>Cancel</Button>
+              <Button variant="outline" onClick={() => {
+                if(user.role === "recruiter") {
+                  navigate("/dashboard");
+                } else {
+                  navigate("/courses");
+                }
+                setIsOpen(false);
+              }}>Cancel</Button>
               <Button variant="destructive" onClick={logoutHandler}>Logout</Button>
             </DialogFooter>
           </DialogContent>
