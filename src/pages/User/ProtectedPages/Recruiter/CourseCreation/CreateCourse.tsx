@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../../../axiosService";
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import { Button } from "@/components/ui/button";
 import { Slash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -55,7 +54,7 @@ const CreateCourseStep1 = () => {
   });
 
   return (
-    <ProtectedLayout>
+  
       <div className="flex flex-col gap-6 p-4">
         <div className="flex justify-between items-center">
           <Breadcrumb>
@@ -126,7 +125,6 @@ const CreateCourseStep1 = () => {
           />
         </div>
       </div>
-    </ProtectedLayout>
   );
 };
 

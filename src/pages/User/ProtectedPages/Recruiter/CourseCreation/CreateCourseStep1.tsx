@@ -1,4 +1,3 @@
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import { ChevronLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -121,7 +120,7 @@ const CreateCourseStep1 = () => {
   };
 
   return (
-    <ProtectedLayout>
+
       <div className="max-w-4xl mx-auto px-4">
         <div
           className="flex items-center mb-8"
@@ -371,7 +370,6 @@ const CreateCourseStep1 = () => {
           </form>
         </Card>
       </div>
-    </ProtectedLayout>
   );
 };
 

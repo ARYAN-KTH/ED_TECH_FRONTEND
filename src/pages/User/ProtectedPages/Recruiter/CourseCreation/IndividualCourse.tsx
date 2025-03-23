@@ -6,8 +6,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import type { AxiosError } from "axios";
 import { toast } from "sonner";
-
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import api from "../../../../../axiosService";
 import type { CourseSection, IndividualCourseResponse } from "./types";
 
@@ -261,7 +259,7 @@ const IndividualCourse = () => {
   
 
   return (
-    <ProtectedLayout>
+
       <div className="container mx-auto p-4 md:p-6">
         {/* Hero Section */}
         <div className="relative w-full rounded-xl overflow-hidden mb-8 bg-gradient-to-r from-primary/10 to-secondary/10">
@@ -860,7 +858,6 @@ const IndividualCourse = () => {
           </div>
         </div>
       </div>
-    </ProtectedLayout>
   );
 };
 

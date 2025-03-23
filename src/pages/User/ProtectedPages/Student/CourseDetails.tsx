@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../../axiosService";
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 
 import {
   Card,
@@ -200,7 +199,6 @@ const CourseDetails = () => {
   };
 
   return (
-    <ProtectedLayout>
       <div className="container mx-auto p-4 md:p-6">
         {/* Hero Section */}
         <div className="relative w-full rounded-xl overflow-hidden mb-8 bg-gradient-to-r from-primary/10 to-secondary/10">
@@ -702,7 +700,6 @@ const CourseDetails = () => {
           </div>
         </div>
       </div>
-    </ProtectedLayout>
   );
 };
 

@@ -5,7 +5,6 @@ import {
   FileText,
   Video,
 } from "lucide-react";
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
@@ -60,7 +59,7 @@ export default function CreateCourseStep2() {
   }
 
   return (
-    <ProtectedLayout>
+
       <div className="container mx-auto p-6 space-y-8">
         <Card className="w-full">
           <CardHeader className="flex flex-row justify-between items-center">
@@ -129,6 +128,6 @@ export default function CreateCourseStep2() {
           </CardContent>
         </Card>
       </div>
-    </ProtectedLayout>
+
   );
 }

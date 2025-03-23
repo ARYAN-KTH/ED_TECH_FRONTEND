@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Menu, X } from "lucide-react"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
@@ -17,7 +17,11 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
-              <span className="text-2xl font-bold text-blue-600">Logo</span>
+              <img
+                src="https://i0.wp.com/edtechhub.org/wp-content/uploads/2020/08/EdTech-Hub-Logo.png?fit=613%2C217&ssl=1"
+                alt="Logo"
+                className="h-16"
+              /> 
             </Link>
           </div>
           <div className="hidden md:block">
@@ -42,14 +46,20 @@ const Navbar = () => {
               aria-expanded={isOpen}
             >
               <span className="sr-only">Open main menu</span>
-              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+              {isOpen ? (
+                <X className="block h-6 w-6" />
+              ) : (
+                <Menu className="block h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
       </div>
 
       <div
-        className={`${isOpen ? "block" : "hidden"} md:hidden transition-all duration-300 ease-in-out`}
+        className={`${
+          isOpen ? "block" : "hidden"
+        } md:hidden transition-all duration-300 ease-in-out`}
         id="mobile-menu"
       >
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
@@ -67,8 +77,8 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
 const NavLink = ({ to, children, className = "" }) => (
   <Link
@@ -77,7 +87,7 @@ const NavLink = ({ to, children, className = "" }) => (
   >
     {children}
   </Link>
-)
+);
 
 const MobileNavLink = ({ to, children, className = "" }) => (
   <Link
@@ -86,7 +96,6 @@ const MobileNavLink = ({ to, children, className = "" }) => (
   >
     {children}
   </Link>
-)
+);
 
-export default Navbar
-
+export default Navbar;

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "../../../../axiosService";
-import ProtectedLayout from "@/components/layouts/ProtectedLayout";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Card,
@@ -46,7 +46,6 @@ const Courses = () => {
   });
 
   return (
-    <ProtectedLayout>
       <div className="flex flex-col gap-6 p-4">
         
 
@@ -94,7 +93,6 @@ const Courses = () => {
           />
         </div>
       </div>
-    </ProtectedLayout>
   );
 };
 
