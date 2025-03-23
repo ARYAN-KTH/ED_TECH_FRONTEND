@@ -64,8 +64,8 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 export function ModernSidebar({ className }: SidebarProps) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const location = useLocation();
-  const [userRole] = useState<"recruiter" | "talent">(user.role);
-  const items = userRole === "recruiter" ? recruiterItems : talentItems;
+  const [userRole] = useState<"Instructor" | "Student">(user.role);
+  const items = userRole === "Instructor" ? recruiterItems : talentItems;
 
   return (
     <div className={cn("pb-12", className)}>
