@@ -18,7 +18,7 @@ export const courseFormSchema = z.object({
     z.instanceof(File).refine((file) => file.type.startsWith("image/"), {
       message: "File must be an image",
     }),
-    z.string().url({ message: "Invalid image URL" }) // ✅ URL bhi allow karega
+    z.string().url({ message: "Invalid image URL" }) // URL bhi allow karega
   ]),
   
   benifits: z

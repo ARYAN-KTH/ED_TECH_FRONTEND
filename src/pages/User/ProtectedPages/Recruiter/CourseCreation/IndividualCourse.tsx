@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -30,12 +29,6 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
   BookOpen,
   Clock,
   DollarSign,
@@ -45,10 +38,7 @@ import {
   Target,
   Star,
   Play,
-  Share2,
-  Bookmark,
   Download,
-  MessageSquare,
   Info,
   ExternalLink,
   Loader2,
@@ -68,7 +58,6 @@ import ConfirmDialog from "@/helper/ConfirmationDialog";
 const IndividualCourse = () => {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  const [isBookmarked, setIsBookmarked] = useState(false);
 
   const {
     data: courseData,
@@ -348,7 +337,7 @@ const IndividualCourse = () => {
 
               <TabsContent value="content" className="mt-0 space-y-6">
                 {/* Course Progress */}
-                <Card className="overflow-hidden border-none shadow-md">
+                {/* <Card className="overflow-hidden border-none shadow-md">
                   <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
                     <div className="flex flex-col gap-3">
                       <h3 className="font-semibold text-lg flex items-center gap-2">
@@ -367,7 +356,7 @@ const IndividualCourse = () => {
                       </p>
                     </div>
                   </div>
-                </Card>
+                </Card> */}
 
                 {/* Course Sections */}
                 <Card className="border-none shadow-md">
@@ -771,55 +760,6 @@ const IndividualCourse = () => {
                     Enroll Now
                   </Button>
 
-                  <div className="flex justify-between gap-2 mb-6">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-10 w-10"
-                            onClick={() => setIsBookmarked(!isBookmarked)}
-                          >
-                            <Bookmark
-                              className={`w-5 h-5 ${
-                                isBookmarked ? "fill-primary text-primary" : ""
-                              }`}
-                            />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            {isBookmarked
-                              ? "Remove from wishlist"
-                              : "Add to wishlist"}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-10 w-10"
-                          >
-                            <Share2 className="w-5 h-5" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Share this course</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-
-                    <Button variant="outline" className="flex-1 h-10">
-                      <MessageSquare className="w-5 h-5 mr-2" />
-                      Contact Instructor
-                    </Button>
-                  </div>
 
                   <div className="space-y-4">
                     <h3 className="font-medium text-lg">

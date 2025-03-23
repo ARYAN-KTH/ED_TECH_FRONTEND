@@ -28,7 +28,6 @@ const Navbar = () => {
             <div className="ml-10 flex items-baseline space-x-4">
               <NavLink to="/course">Courses</NavLink>
               <NavLink to="/about-us">About us</NavLink>
-              <NavLink to="/contact">Contact</NavLink>
             </div>
           </div>
           <div className="hidden md:block">
@@ -66,7 +65,6 @@ const Navbar = () => {
           <MobileNavLink to="/home">Home</MobileNavLink>
           <MobileNavLink to="/catalog">Catalog</MobileNavLink>
           <MobileNavLink to="/about">About us</MobileNavLink>
-          <MobileNavLink to="/contact">Contact</MobileNavLink>
           <MobileNavLink to="/login">Login</MobileNavLink>
           <MobileNavLink
             to="/signup"

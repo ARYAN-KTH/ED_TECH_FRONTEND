@@ -24,6 +24,7 @@ const SignUpScreen = () => {
     formState: { errors },
   } = useForm<SignUpFormData>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
   });
 
   const [showPassword, setShowPassword] = useState(false);

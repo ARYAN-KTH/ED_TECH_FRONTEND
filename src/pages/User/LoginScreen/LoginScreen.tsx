@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import { ApiResponse } from "../SignUpFlow/type";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import api from "../../../axiosService";
-import { useState } from "react";
 import {signInWithGoogle} from "../../../googleSignup/auth";
 
 interface loginData {
@@ -25,12 +23,11 @@ const LoginScreen = () => {
     formState: { errors },
   } = useForm<loginData>();
 
-  const [activeTab, setActiveTab] = useState("Student");
 
   const googleLoginHandler = async () => {
     try {
       const result = await signInWithGoogle();
-      mutation.mutate({email:result.email, password:result.uid, role:activeTab});
+      mutation.mutate({email:result.email, password:result.uid, });
       console.log("User Info:", result);
     } catch (error) {
       console.error("Error during login", error);
@@ -38,7 +35,7 @@ const LoginScreen = () => {
   };
 
   const mutation = useMutation({
-    mutationFn: async (data: loginData & {role:string}): Promise<ApiResponse> => {
+    mutationFn: async (data: loginData): Promise<ApiResponse> => {
       const response = await api.post<ApiResponse>("/user/login", data, { withCredentials: true });
       console.log(response);
       return response.data; // Ensure response.data ka type ApiResponse ho
@@ -50,22 +47,22 @@ const LoginScreen = () => {
         localStorage.setItem("token", data.accessToken);
       }
       localStorage.setItem("user", JSON.stringify(data.user));
-      if(activeTab === "Instructor"){
+      if(data.user.role === "Instructor"){
         Navigate("/create-course-step1");
       }else{
         Navigate("/courses");
       }
     },
-    onError: (error: AxiosError<ApiResponse>) => {
-      console.log(error);
-      const errorMessage = error.response?.data?.message || "Something went wrong!";
+    onError: (error: AxiosError<{message: string}>) => {
+      console.log("error is", error);
+      const errorMessage = error?.response?.data?.message || "Something went wrong!";
       toast.error(errorMessage);
     },
   });
 
 
   const submitHandler = (data: loginData) => {
-    mutation.mutate({...data,role:activeTab});
+    mutation.mutate({...data});
     console.log("Login Success", data);
   };
 
@@ -78,16 +75,6 @@ const LoginScreen = () => {
             Welcome Back, Discover your passion
           </p>
           <div>
-            <Tabs defaultValue="Student" onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full">
-                <TabsTrigger value="Student" className="w-1/2">
-                  Student
-                </TabsTrigger>
-                <TabsTrigger value="Instructor" className="w-1/2">
-                  Instructor
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
             <form
               onSubmit={handleSubmit(submitHandler)}
               className="space-y-4 mt-6"

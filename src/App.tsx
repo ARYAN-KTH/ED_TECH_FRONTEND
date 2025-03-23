@@ -15,6 +15,9 @@ import NotFound from "./pages/NotFound";
 import Courses from "./pages/User/ProtectedPages/Student/Course";
 import CourseDetails from "./pages/User/ProtectedPages/Student/CourseDetails";
 import Layout from "./components/layouts/layout";
+import Dashboard from "./pages/User/ProtectedPages/Recruiter/Dashboard/Dashboard";
+import EnrolledCourse from "./pages/User/ProtectedPages/Student/Enrolled-Course";
+import PurchaseHistory from "./pages/User/ProtectedPages/Student/Purchase-History";
 
 const App = () => {
   return (
@@ -43,10 +46,13 @@ const App = () => {
               />
               <Route path="/create-course" element={<CreateCourse />} />
               <Route path="/individual-course" element={<IndividualCourse />} />
+              <Route path="/dashboard" element={<Dashboard />} />
 
               {/* protected student routes */}
               <Route path="/courses" element={<Courses />} />
               <Route path="/course-details" element={<CourseDetails />} />
+              <Route path="/enrolled-course" element={<EnrolledCourse />} />
+              <Route path="/purchase-history" element={<PurchaseHistory />} />
             </Route>
           </Route>
 

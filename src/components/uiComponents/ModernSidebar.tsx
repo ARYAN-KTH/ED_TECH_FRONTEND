@@ -1,86 +1,59 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { 
-  Calendar, 
-  Home, 
-  Inbox, 
-  Search, 
-  Settings, 
-  BookOpen, 
-  Heart, 
+import {
+  Home,
+  BookOpen,
   ShoppingBag,
   Menu,
+  GraduationCap,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Menu items with icons for recruiters
 const recruiterItems = [
   {
     title: "Dashboard",
-    url: "/create-course",
+    url: "/dashboard",
     icon: Home,
-  },
-  {
-    title: "My Profile",
-    url: "#",
-    icon: Inbox,
   },
   {
     title: "My Courses",
     url: "/create-course",
-    icon: Calendar,
+    icon: GraduationCap,
   },
   {
     title: "Logout",
     url: "/logout",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    icon: LogOut,
   },
 ];
 
 // Menu items with icons for students/talent
 const talentItems = [
   {
-    title: "My Profile",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Enrolled Courses",
+    title: "All Courses",
     url: "/courses",
     icon: BookOpen,
   },
   {
-    title: "Wishlist",
-    url: "#",
-    icon: Heart,
+    title: "Enrolled Courses",
+    url: "/enrolled-course",
+    icon: BookOpen,
   },
   {
     title: "Purchase History",
-    url: "#",
+    url: "/purchase-history",
     icon: ShoppingBag,
-  },
-  {
-    title: "Course",
-    url: "/course-details",
-    icon: Calendar,
   },
   {
     title: "Logout",
     url: "/logout",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    icon: LogOut,
   },
 ];
 
@@ -89,38 +62,60 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function ModernSidebar({ className }: SidebarProps) {
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
   const location = useLocation();
-  // TODO: Replace with actual user role detection
-  const [userRole] = useState<'recruiter' | 'talent'>('recruiter');
-  
-  // Choose menu items based on user role
-  const items = userRole === 'recruiter' ? recruiterItems : talentItems;
+  const [userRole] = useState<"recruiter" | "talent">(user.role);
+  const items = userRole === "recruiter" ? recruiterItems : talentItems;
 
   return (
     <div className={cn("pb-12", className)}>
-      <div className="space-y-4 py-4">
-        <div className="px-4 py-2">
-          <h2 className="mb-2 px-2 text-lg font-semibold tracking-tight">
-            Navigation
-          </h2>
-          <div className="space-y-1">
-            {items.map((item) => (
-              <Button
-                key={item.title}
-                variant={location.pathname === item.url ? "secondary" : "ghost"}
-                size="sm"
-                className="w-full justify-start"
-                asChild
-              >
-                <Link to={item.url} className="flex items-center">
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
-            ))}
+      {/* Header with Logo */}
+      <div className="px-6 py-6 flex items-center border-b">
+        <BookOpen className="h-6 w-6 text-blue-600" />
+        <h2 className="ml-2 text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          EduTech
+        </h2>
+      </div>
+
+      {/* User Profile Section */}
+      <div className="px-6 py-4 border-b">
+        <div className="flex items-center gap-4">
+          <Avatar>
+            <AvatarImage src="" />
+            <AvatarFallback className="bg-blue-600 text-white">{user?.firstName[0]}{user?.lastName[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="font-medium">{user?.firstName} {user?.lastName}</h3>
+            <p className="text-sm text-gray-500">{user?.role}</p>
           </div>
         </div>
       </div>
+
+      {/* Navigation Items */}
+      <ScrollArea className="px-4 py-6">
+        <nav className="space-y-2">
+          {items.map((item) => (
+            <Link
+              key={item.title}
+              to={item.url}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-blue-600",
+                location.pathname === item.url 
+                  ? "bg-blue-50 text-blue-600" 
+                  : "hover:bg-blue-50/50"
+              )}
+            >
+              <item.icon className={cn(
+                "h-4 w-4",
+                location.pathname === item.url 
+                  ? "text-blue-600"
+                  : "text-gray-400"
+              )} />
+              <span className="text-sm font-medium">{item.title}</span>
+            </Link>
+          ))}
+        </nav>
+      </ScrollArea>
     </div>
   );
 }
@@ -129,15 +124,13 @@ export function MobileSidebar() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="md:hidden">
+        <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-5 w-5" />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="pr-0 sm:max-w-xs">
-        <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
-          <ModernSidebar className="px-2" />
-        </ScrollArea>
+      <SheetContent side="left" className="p-0 w-72">
+        <ModernSidebar />
       </SheetContent>
     </Sheet>
   );
