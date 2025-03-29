@@ -30,7 +30,6 @@ const SignUpScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("Student");
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const googleSignupHandler = async () => {
     try {
       const result = await signInWithGoogle();
@@ -69,134 +68,165 @@ const SignUpScreen = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-col md:flex-row justify-between items-center min-h-screen p-4 md:p-8 gap-8 max-w-7xl mx-auto">
-        <div className="w-full md:w-1/2 max-w-md">
-          <p className="text-2xl font-semibold mb-6">
-            Welcome Back, Discover your passion
-          </p>
-          <div>
-            <Tabs
-              defaultValue="Student"
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="w-full">
-                <TabsTrigger value="Student" className="w-1/2">
-                  Student
-                </TabsTrigger>
-                <TabsTrigger value="Instructor" className="w-1/2">
-                  Instructor
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-            <form
-              onSubmit={handleSubmit(submitHandler)}
-              className="space-y-4 mt-6"
-            >
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {" "}
-                  First Name *
-                </label>
-                <Input type="text" {...register("firstName")} />
-                {errors.firstName && (
-                  <p className="text-red-500 text-xs">
-                    {errors.firstName.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {" "}
-                  Last Name *
-                </label>
-                <Input type="text" {...register("lastName")} />
-                {errors.lastName && (
-                  <p className="text-red-500 text-xs">
-                    {errors.lastName.message}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  {" "}
-                  Email *
-                </label>
-                <Input type="email" {...register("email")} />
-                {errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Phone *
-                </label>
-                <Input type="text" {...register("phone")} />
-                {errors.phone && (
-                  <p className="text-red-500 text-xs">{errors.phone.message}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Password *
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    {...register("password")}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[100vh] ">
+          <div className="w-full md:w-1/2 max-w-md backdrop-blur-md bg-white/80 px-8 py-4 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl">
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Create Account</h1>
+            <div>
+              <Tabs
+                defaultValue="Student"
+                onValueChange={setActiveTab}
+                className="w-full mb-6"
+              >
+                <TabsList className="w-full grid grid-cols-2 bg-gray-100 p-1 rounded-lg">
+                  <TabsTrigger 
+                    value="Student" 
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200"
+                  >
+                    Student
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="Instructor"
+                    className="data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-md transition-all duration-200"
+                  >
+                    Instructor
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <form
+                onSubmit={handleSubmit(submitHandler)}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      First Name
+                    </label>
+                    <Input 
+                      type="text" 
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                      {...register("firstName")} 
+                    />
+                    {errors.firstName && (
+                      <p className="text-red-500 text-sm">
+                        {errors.firstName.message}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Last Name
+                    </label>
+                    <Input 
+                      type="text" 
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                      {...register("lastName")} 
+                    />
+                    {errors.lastName && (
+                      <p className="text-red-500 text-sm">
+                        {errors.lastName.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <Input 
+                    type="email" 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    {...register("email")} 
                   />
-                  {showPassword ? (
-                    <EyeOff
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500"
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
-                  ) : (
-                    <Eye
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500"
-                      onClick={() => setShowPassword(!showPassword)}
-                    />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
-                {errors.password && (
-                  <p className="text-red-500 text-xs">
-                    {errors.password.message}
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Phone
+                  </label>
+                  <Input 
+                    type="text" 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    {...register("phone")} 
+                  />
+                  {errors.phone && (
+                    <p className="text-red-500 text-sm">
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200 pr-10"
+                      {...register("password")}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors duration-200"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-4 pt-2">
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:opacity-90 transition-all duration-200 disabled:opacity-50"
+                    disabled={mutation.isPending}
+                  >
+                    {mutation.isPending ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin"></div>
+                        <span>Creating account...</span>
+                      </div>
+                    ) : (
+                      "Sign Up"
+                    )}
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={googleSignupHandler}
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                  >
+                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                    Continue with Google
+                  </Button>
+                  <p className="text-center text-gray-600">
+                    Already have an account?{" "}
+                    <Link to="/login" className="text-blue-600 hover:underline font-medium">
+                      Log in here
+                    </Link>
                   </p>
-                )}
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                <Button
-                  type="submit"
-                  className={` ${
-                    mutation.isPending ? "bg-gray-400 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {mutation.isPending ? "Loading..." : "Signup"}
-                </Button>
-                <span>
-                  Already have account{" "}
-                  <Link to="/login" className="text-blue-800 hover:underline">
-                    login here
-                  </Link>
-                  !
-                </span>
-{/*                 <Button onClick={googleSignupHandler}>
-                 Signup with Google
-                </Button> */}
-              </div>
-            </form>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-        <div className="w-full md:w-1/2">
-          <img
-            src="https://thumbs.dreamstime.com/b/edtech-education-technology-e-learning-online-learning-internet-technology-concept-edtech-education-technology-e-learning-online-341756501.jpg"
-            alt="Education Technology Illustration"
-            className="w-full h-auto rounded-lg shadow-lg"
-          />
+          
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
