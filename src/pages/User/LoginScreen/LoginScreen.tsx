@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -68,75 +67,87 @@ const LoginScreen = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-col md:flex-row justify-between items-center min-h-screen p-4 md:p-8 gap-8 max-w-7xl mx-auto">
-        <div className="w-full md:w-1/2 max-w-md">
-          <p className="text-2xl font-semibold mb-6">
-            Welcome Back, Discover your passion
-          </p>
-          <div>
-            <form
-              onSubmit={handleSubmit(submitHandler)}
-              className="space-y-4 mt-6"
-            >
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Email *
-                </label>
-                <Input
-                  type="email"
-                  {...register("email", { required: "Email is required" })}
-                />
-                {errors.email && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {String(errors?.email?.message)}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Password *
-                </label>
-                <Input
-                  type="password"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-red-600 text-sm mt-1">
-                    {String(errors?.password?.message)}
-                  </p>
-                )}
-              </div>
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-                <Button type="submit" disabled={mutation.isPending}>
-                  {mutation.isPending ? "Loading..." : "Login"}
-                </Button>
-                <span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4 md:p-8">
+      <div className="max-w-7xl mx-auto">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[100vh]">
+          <div className="w-full md:w-1/2 max-w-md backdrop-blur-md bg-white/80 p-8 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl">
+            <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Welcome Back</h1>
+            <p className="text-gray-600 mb-6">Discover your passion for learning</p>
+            <div>
+              <form
+                onSubmit={handleSubmit(submitHandler)}
+                className="space-y-5"
+              >
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    {...register("email", { required: "Email is required" })}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {String(errors?.email?.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Password
+                  </label>
+                  <Input
+                    type="password"
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+                    {...register("password", {
+                      required: "Password is required",
+                    })}
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {String(errors?.password?.message)}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-4">
+                  <Button 
+                    type="submit" 
+                    disabled={mutation.isPending}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 rounded-lg hover:opacity-90 transition-all duration-200 disabled:opacity-50"
+                  >
+                    {mutation.isPending ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin"></div>
+                        <span>Logging in...</span>
+                      </div>
+                    ) : (
+                      "Login"
+                    )}
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={googleLoginHandler}
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                  >
+                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
+                    Continue with Google
+                  </Button>
+                </div>
+                <p className="text-center text-gray-600">
                   Don't have an account?{" "}
-                  <Link to="/signup" className="text-blue-800 hover:underline">
-                    Signup here
+                  <Link to="/signup" className="text-blue-600 hover:underline font-medium">
+                    Sign up here
                   </Link>
-                  !
-                </span>
-              </div>
-{/*               <Button onClick={googleLoginHandler}>
-                login with Google
-              </Button> */}
-            </form>
+                </p>
+              </form>
+            </div>
           </div>
         </div>
-        <div className="w-full md:w-1/2">
-          <img
-            src="https://thumbs.dreamstime.com/b/edtech-education-technology-e-learning-online-learning-internet-technology-concept-edtech-education-technology-e-learning-online-341756501.jpg"
-            alt="Education Technology Illustration"
-            className="w-full h-auto rounded-lg shadow-lg"
-          />
-        </div>
       </div>
-    </>
+    </div>
   );
 };
 
