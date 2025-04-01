@@ -171,7 +171,7 @@ const CoursePage = () => {
                 <div className="p-6">
                   
 
-                  <p className="text-gray-700 mb-4 line-clamp-2">{course.description}</p>
+                  <p className="text-gray-700 mb-4 line-clamp-2">{course?.title}</p>
 
                   <div className="flex flex-wrap gap-3 mb-4">
                     <div className="flex items-center text-sm text-gray-600">
