@@ -8,7 +8,6 @@ import { ApiResponse } from "../SignUpFlow/type";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import api from "../../../axiosService";
-import {signInWithGoogle} from "../../../googleSignup/auth";
 
 interface loginData {
   email: string;
@@ -23,16 +22,6 @@ const LoginScreen = () => {
     formState: { errors },
   } = useForm<loginData>();
 
-
-  const googleLoginHandler = async () => {
-    try {
-      const result = await signInWithGoogle();
-      mutation.mutate({email:result.email, password:result.uid, });
-      console.log("User Info:", result);
-    } catch (error) {
-      console.error("Error during login", error);
-    }
-  };
 
   const mutation = useMutation({
     mutationFn: async (data: loginData): Promise<ApiResponse> => {
@@ -125,15 +114,6 @@ const LoginScreen = () => {
                     ) : (
                       "Login"
                     )}
-                  </Button>
-                  <Button 
-                    type="button"
-                    onClick={googleLoginHandler}
-                    variant="outline"
-                    className="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                  >
-                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                    Continue with Google
                   </Button>
                 </div>
                 <p className="text-center text-gray-600">

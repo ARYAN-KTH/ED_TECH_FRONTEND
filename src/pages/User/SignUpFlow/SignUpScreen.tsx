@@ -14,7 +14,6 @@ import { useMutation } from "@tanstack/react-query";
 import api from "../../../axiosService";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import {signInWithGoogle} from "../../../googleSignup/auth";
 
 const SignUpScreen = () => {
   const navigate = useNavigate();
@@ -30,15 +29,6 @@ const SignUpScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("Student");
 
-  const googleSignupHandler = async () => {
-    try {
-      const result = await signInWithGoogle();
-      mutation.mutate({email:result.email,googleAuth:true,firstName:result.displayName,lastName:result.displayName,phone:"3287447473", password:result.uid, role:activeTab});
-      console.log("User Info:", result);
-    } catch (error) {
-      console.error("Error during login", error);
-    }
-  };
 
   // Define the mutation
   const mutation = useMutation({
@@ -203,15 +193,6 @@ const SignUpScreen = () => {
                     ) : (
                       "Sign Up"
                     )}
-                  </Button>
-                  <Button 
-                    type="button"
-                    onClick={googleSignupHandler}
-                    variant="outline"
-                    className="w-full flex items-center justify-center gap-2 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200"
-                  >
-                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-                    Continue with Google
                   </Button>
                   <p className="text-center text-gray-600">
                     Already have an account?{" "}
